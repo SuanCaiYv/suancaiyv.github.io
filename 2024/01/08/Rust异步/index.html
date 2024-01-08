@@ -1,0 +1,925 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Minima -->
+  <!-- Hexo theme created by @adisaktijrs -->
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+
+  
+  <title>Rust异步</title>
+  
+  <link rel="sitemap" href="http://example.comsitemap.xml,sitemap.txt" />
+  
+  <link rel="canonical" href="http://example.com/2024/01/08/Rust%E5%BC%82%E6%AD%A5/">
+  
+  <meta name="description" content="前言Rust于2018年引入异步，四年后的今天，我第一次接触Rust且使用async&amp;#x2F;await实现了一个小的IM(即时通讯)系统，带着原本对于Rust的好奇和对于异步的疑惑，翻阅了一些文章和参考，最后得到了一些答案。 在阅读之前，希望读者：  了解有限自动状态机 熟悉Rust语法 了解并">
+  
+  
+  <meta name="author" content="John Doe">
+  
+  
+  
+  <meta property="og:site_name" content="Hexo" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Rust异步" />
+  
+  <meta property="og:description" content="前言Rust于2018年引入异步，四年后的今天，我第一次接触Rust且使用async&amp;#x2F;await实现了一个小的IM(即时通讯)系统，带着原本对于Rust的好奇和对于异步的疑惑，翻阅了一些文章和参考，最后得到了一些答案。 在阅读之前，希望读者：  了解有限自动状态机 熟悉Rust语法 了解并">
+  
+  <meta property="og:url" content="http://example.com/2024/01/08/Rust%E5%BC%82%E6%AD%A5/" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Rust异步">
+  
+  <meta name="twitter:description" content="前言Rust于2018年引入异步，四年后的今天，我第一次接触Rust且使用async&amp;#x2F;await实现了一个小的IM(即时通讯)系统，带着原本对于Rust的好奇和对于异步的疑惑，翻阅了一些文章和参考，最后得到了一些答案。 在阅读之前，希望读者：  了解有限自动状态机 熟悉Rust语法 了解并">
+  
+  
+  
+  
+  <meta name="twitter:url" content="http://example.com/2024/01/08/Rust%E5%BC%82%E6%AD%A5/" />
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Preload fonts
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="preload" href="/fonts/dm-serif-display-v4-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-v2-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  
+<link rel="stylesheet" href="/css/normalize.css">
+
+  
+<link rel="stylesheet" href="/css/skeleton.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+<link rel="stylesheet" href="/css/prism-dark.css">
+
+  
+<link rel="stylesheet" href="/css/prism-line-numbers.css">
+
+  <!-- User css -->
+  
+  
+<link rel="stylesheet" href="/css/user.css">
+
+  
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="/images/favicon.ico">
+
+  <!-- Custom Theme Color Style
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <style>
+  a:not(.icon) {
+    text-decoration-color: #0FA0CE;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 50%,
+      #0FA0CE 50%
+    );
+  }
+  blockquote {
+    border-left: 8px solid #0FA0CE;
+  }
+  .nanobar .bar {
+    background: #0FA0CE;
+  }
+  .button.button-primary:hover,
+  button.button-primary:hover,
+  input[type="submit"].button-primary:hover,
+  input[type="reset"].button-primary:hover,
+  input[type="button"].button-primary:hover,
+  .button.button-primary:focus,
+  button.button-primary:focus,
+  input[type="submit"].button-primary:focus,
+  input[type="reset"].button-primary:focus,
+  input[type="button"].button-primary:focus {
+    background-color: #0FA0CE;
+    border-color: #0FA0CE;
+  }
+  input[type="email"]:focus,
+  input[type="number"]:focus,
+  input[type="search"]:focus,
+  input[type="text"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  input[type="password"]:focus,
+  textarea:focus,
+  select:focus {
+    border: 1px solid #0FA0CE;
+  }
+</style>
+
+  <!-- Google Analytics (With Privacy Settings On)
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  
+
+  
+  <script src="/js/pic.min.js" defer></script>
+  
+
+  
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div>
+
+        <div class="row">
+  <div class="two columns" style="max-width: 50px">
+    <h1 class="mt-2 mode">
+      <div onclick=setDarkMode(true) id="darkBtn">🌙</div>
+      <div onclick=setDarkMode(false) id="lightBtn" class=hidden>☀️</div>
+      <script >
+        if (localStorage.getItem('preferredTheme') == 'dark') {
+          setDarkMode(true)
+        }
+        function setDarkMode(isDark) {
+          var darkBtn = document.getElementById('darkBtn')
+          var lightBtn = document.getElementById('lightBtn')
+          if (isDark) {
+            lightBtn.style.display = "block"
+            darkBtn.style.display = "none"
+            localStorage.setItem('preferredTheme', 'dark');
+          } else {
+            lightBtn.style.display = "none"
+            darkBtn.style.display = "block"
+            localStorage.removeItem('preferredTheme');
+          }
+          document.body.classList.toggle("darkmode");
+        }
+      </script>
+    </h1>
+  </div>
+
+  <div class="six columns ml-1">
+    <h1 class="mt-2">
+      给代码来点Buff！
+    </h1>
+  </div>
+
+  <div class="twelve columns">
+    <div class="row">
+      <div class="nine columns left">
+        <a href="/">Home</a>
+        
+          
+          <a href="/Works" class="ml">Works</a>
+          
+        
+          
+          <a href="/About" class="ml">About</a>
+          
+        
+        
+          
+            <a href="mailto:codewithbuff@163.com" target="_blank" class="ml">Email</a>
+          
+        
+      </div>
+    </div>
+    <hr style="margin-bottom: 2.6rem">
+  </div>
+</div>
+
+        <div class="trans">
+            <h2>Rust异步</h2>
+
+  <p><img src="/2024/01/08/Rust%E5%BC%82%E6%AD%A5/async-rust.svg"></p>
+<h3 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h3><p>Rust于2018年引入异步，四年后的今天，我第一次接触Rust且使用async&#x2F;await实现了一个小的IM(即时通讯)系统，带着原本对于Rust的好奇和对于异步的疑惑，翻阅了一些文章和参考，最后得到了一些答案。</p>
+<p>在阅读之前，希望读者：</p>
+<ul>
+<li>了解有限自动状态机</li>
+<li>熟悉Rust语法</li>
+<li>了解并使用过Rust异步</li>
+<li>对于Reactor模型(Epoll&#x2F;Kqueue处理IO)有所了解</li>
+<li>了解线程和协程，协作式&#x2F;抢占式调度的区别</li>
+</ul>
+<h4 id="有限自动状态机"><a href="#有限自动状态机" class="headerlink" title="有限自动状态机"></a>有限自动状态机</h4><p>又称<strong>状态机</strong>，简称<code>fsm</code>，讨论一般情况，一个状态机系统由四个元素组成：</p>
+<ul>
+<li>状态：State</li>
+<li>事件：Event，或者条件，指令</li>
+<li>行为：Action，或者函数，方法</li>
+<li>转换：Transfer</li>
+</ul>
+<p>以自动门的开关为例，可以画出如下状态机转换图：</p>
+<p><img src="/2024/01/08/Rust%E5%BC%82%E6%AD%A5/fsm.svg"></p>
+<p><strong>Rust对于异步的实现依赖于状态机</strong>。</p>
+<h4 id="IO多路复用"><a href="#IO多路复用" class="headerlink" title="IO多路复用"></a>IO多路复用</h4><p>Linux&#x2F;macOS&#x2F;Windows等系统对于非阻塞IO的实现为Epoll&#x2F;Kqueue&#x2F;IOCP，其中IOCP支持异步非阻塞IO。以上称为“多路复用IO”，旨在减少因为等待IO而造成的大量线程创建，<strong>提高系统连接数</strong>。具体细节这里不会进行阐述。</p>
+<h4 id="异步"><a href="#异步" class="headerlink" title="异步"></a>异步</h4><p>关于更好地实现<strong>IO密集型</strong>App的吞吐量和CPU利用率，程序并行化的过程经历了：多进程&#x3D;&gt;多线程&#x3D;&gt;协程&#x2F;异步 这样的发展趋势。来看不同语言的实现：</p>
+<ul>
+<li>Java：Loom实现协程(开发中)，或者Pivotal提出的ReactorProject&#x2F;VertX等项目实现的响应式IO</li>
+<li>Golang：Goroutine协程</li>
+<li>Kotlin：协程</li>
+<li>Python：异步</li>
+<li>JavaScript：异步</li>
+</ul>
+<p>其中协程分为：</p>
+<ul>
+<li><strong>有栈协程</strong>：又名“绿色线程”。比如Goroutine，栈会随着运行动态增长，进而引入了栈收缩伸张等问题</li>
+<li><strong>无栈协程</strong>：比如Python的生成器，不同的执行体跑在当前线程(或者执行者线程)的栈里，没有独属于自己的栈</li>
+</ul>
+<p>异步则是协程的一种变种，Rust中选用了这种形式，并且贴近于无栈协程，具体后面会展开。</p>
+<p>Rust的异步无法直接运行，<strong>依赖于运行时进行调度</strong>，由于官方的运行时性能欠缺，所以更多使用的是Tokio，具体见Tokio文档。</p>
+<p>Rust仅仅定义了异步Task的生成和异步的唤醒方式，并没有定义异步的调度，对于底层操作的封装(比如IO，定时器，锁等)和唤醒器的实现，所以这就给第三方提供了很多的可能，也为我们自己实现自己的异步运行时提供了机会。</p>
+<h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><h4 id="生成器"><a href="#生成器" class="headerlink" title="生成器"></a>生成器</h4><p>前面提到，Rust的异步类似于无栈协程，而Rust<strong>早期</strong>对于异步的尝试，则是通过<strong>Generator的形式实现</strong>的。在Python，JavaScript等语言均可以见到生成器的身影，<a target="_blank" rel="noopener" href="https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Generator">Generator</a>。</p>
+<p>具体来说，生成器负责生成<strong>执行体(或者执行函数)<strong>，一个执行体由</strong>可执行代码和数条yield语句</strong>组成，<strong>每一个yield把执行体切分成了不同的执行阶段</strong>。对于执行体的执行，会从上一次中断位置执行，直到遇到下一个yield(又或者称为中断点&#x2F;保存点)位置，此时会保存执行体的执行状态，包括更新之后的局部变量等。</p>
+<p>通过上述描述，可以想到这和线程切换有些类似，如果把每一个线程看成一个可执行的片段，那么线程切换也是需要保存上下文，进行下一个线程的切换(执行片段的切换，不过执行片段是向同一个方向推进的，线程则是由调度算法决定下一个执行的目标)。</p>
+<p>理解到这里，就理解了大致的生成器使用原理。</p>
+<p>Rust也曾经使用这种方式来处理异步，但是因为Rust的生命周期和借用规则的存在，导致跨yield保存上下文实现起来比较困难，所以改进之后得到了现在的async&#x2F;await，即生成器是Rust异步的前身，后面会详细叙述这一点。</p>
+<p>Rust中对于生成器有两个主要的定义：</p>
+<pre><code class="highlight rust"><span class="keyword">pub</span> <span class="keyword">trait</span> <span class="title class_">Generator</span>&lt;R = ()&gt; &#123;
+    <span class="keyword">type</span> <span class="title class_">Yield</span>;
+
+    <span class="keyword">type</span> <span class="title class_">Return</span>;
+
+    <span class="keyword">fn</span> <span class="title function_">resume</span>(<span class="keyword">self</span>: Pin&lt;&amp;<span class="keyword">mut</span> <span class="keyword">Self</span>&gt;, arg: R) <span class="punctuation">-&gt;</span> GeneratorState&lt;<span class="keyword">Self</span>::Yield, <span class="keyword">Self</span>::Return&gt;;
+&#125;
+
+<span class="keyword">pub</span> <span class="keyword">enum</span> <span class="title class_">GeneratorState</span>&lt;Y, R&gt; &#123;
+    <span class="title function_ invoke__">Yielded</span>(Y),
+
+    <span class="title function_ invoke__">Complete</span>(R),
+&#125;</code></pre>
+
+<p>这里的<code>GeneratorState</code>则是对应了执行体的状态，<strong>每一个yield中断点</strong>都会得到一个<code>GeneratorState::Yielded</code>的枚举值，而执行体结束之后，则会得到一个<code>GeneratorState::Complete</code>枚举值。</p>
+<p>此外注意到，<code>Generator::resume()</code>的返回值对应了<code>GeneratorState</code>，侧面说明这个方法负责推进执行体的执行。</p>
+<p>至于编译器对于执行体的实现，下面会说。</p>
+<h4 id="为什么是生成器？异步哪里去了？"><a href="#为什么是生成器？异步哪里去了？" class="headerlink" title="为什么是生成器？异步哪里去了？"></a>为什么是生成器？异步哪里去了？</h4><p>前面说生成器对于横跨保存点的引用处理会比较麻烦，所以优化处理之后得到了异步。在现在版本的Rust异步中，其实现和<strong>生成器的实现看起来差不多</strong>，而仅仅在某些名词或者执行推进方式上有所不同。此外对于Future的生成以及处理，是和编译器强耦合的，找到相关的文章或者源码，不太容易，涉及到的代码也仅是LLVM-IR，所以我们借助生成器来理解并尝试使用生成器模拟一个异步定时器。</p>
+<h4 id="异步体系"><a href="#异步体系" class="headerlink" title="异步体系"></a>异步体系</h4><p>Rust的异步组件可以分为：</p>
+<ul>
+<li>Future：会在未来返回某个值的执行体</li>
+<li>Executor：执行器，负责推进Future的执行，调度多个Future，响应Future的唤醒操作</li>
+<li>Waker：针对某一Future绑定的唤醒器，用于当异步资源就绪时，唤醒执行器继续推进</li>
+<li>Reactor：代表一些异步操作，比如网络，文件IO，或者定时器等会在未来某个时间触发的行为</li>
+</ul>
+<p>一般来说，<strong>异步面相IO密集型App</strong>，所以一般来说Reactor就是最底层的Future，其他的操作应该嵌套在Reactor操作之上。</p>
+<p>如果按照这样的逻辑去划分，则Future可以分为两类：</p>
+<ul>
+<li><strong>叶子Future</strong>：即本身不会等待任何异步操作的Future，其本身就是一个异步事件</li>
+<li><strong>非叶子Future</strong>：本身的执行需要其他Future的结果，这也是大部分开发者编写的Future的形式</li>
+</ul>
+<p>这里给出一个图片：</p>
+<p><img src="/2024/01/08/Rust%E5%BC%82%E6%AD%A5/future_tree.svg"></p>
+<p>蓝色的则是包含Reactor的<strong>叶子Future</strong>，紫色的是嵌套了其他Future的<strong>非叶子Future</strong>；上图中的箭头循环的含义后面解释。</p>
+<h3 id="细节"><a href="#细节" class="headerlink" title="细节"></a>细节</h3><h4 id="Generator"><a href="#Generator" class="headerlink" title="Generator"></a>Generator</h4><p>上面提到了yield机制，来看看Rust对于生成器生成的执行体，具体编译成了什么样的实现。</p>
+<p>前文提到状态机是不可缺少的部分，而针对每一个yield，都会生成一个具体的状态，并在状态里保存当前上下文，具体来说就是在枚举值里保存当前执行体涉及到的变量。</p>
+<p>在这里我们手动来实现一个执行体的运行，通过<strong>硬编码模拟编译器生成的结果</strong>，然后手动调用resume，推动状态的切换，以此达到执行体的阶段性执行。</p>
+<p>请确保你的Rust为Nightly版本：</p>
+<pre><code class="highlight rust"><span class="meta">#![feature(generators, generator_trait)]</span>
+
+<span class="keyword">use</span> std::&#123;
+    pin::Pin,
+    sync::&#123;Arc, Mutex&#125;,
+    task::Poll,
+    time::Duration,
+    ops::Generator,
+&#125;;
+
+<span class="meta">#[derive(Clone)]</span>
+<span class="keyword">struct</span> <span class="title class_">SimpleWaker</span> &#123;
+    wake_fn: Arc&lt;Mutex&lt;<span class="type">Box</span>&lt;<span class="keyword">dyn</span> <span class="title function_ invoke__">FnMut</span>() <span class="punctuation">-&gt;</span> () + <span class="built_in">Send</span> + <span class="symbol">&#x27;static</span>&gt;&gt;&gt;,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">SimpleWaker</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">wake</span>(&amp;<span class="keyword">self</span>) &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">wake_fn</span> = <span class="keyword">self</span>.wake_fn.<span class="title function_ invoke__">lock</span>().<span class="title function_ invoke__">unwrap</span>();
+        <span class="title function_ invoke__">wake_fn</span>();
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">empty</span>() <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;
+        SimpleWaker &#123;
+            wake_fn: Arc::<span class="title function_ invoke__">new</span>(Mutex::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(|| &#123;&#125;))),
+        &#125;
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">set_wake_fn</span>(&amp;<span class="keyword">self</span>, wake_fn0: <span class="type">Box</span>&lt;<span class="keyword">dyn</span> <span class="title function_ invoke__">FnMut</span>() <span class="punctuation">-&gt;</span> () + <span class="built_in">Send</span> + <span class="symbol">&#x27;static</span>&gt;) &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">wake_fn</span> = <span class="keyword">self</span>.wake_fn.<span class="title function_ invoke__">lock</span>().<span class="title function_ invoke__">unwrap</span>();
+        *wake_fn = wake_fn0;
+    &#125;
+&#125;
+
+<span class="keyword">struct</span> <span class="title class_">SimpleTimeout</span> &#123;
+    duration: Duration,
+    timeout: <span class="type">bool</span>,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">SimpleTimeout</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">poll</span>(<span class="keyword">mut</span> <span class="keyword">self</span>: Pin&lt;&amp;<span class="keyword">mut</span> <span class="keyword">Self</span>&gt;, waker: &amp;SimpleWaker) <span class="punctuation">-&gt;</span> Poll&lt;()&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.timeout &#123;
+            <span class="keyword">return</span> Poll::<span class="title function_ invoke__">Ready</span>(());
+        &#125;
+        <span class="keyword">let</span> <span class="variable">waker_clone</span> = waker.<span class="title function_ invoke__">clone</span>();
+        <span class="keyword">let</span> <span class="variable">duration</span> = <span class="keyword">self</span>.duration;
+        std::thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+            std::thread::<span class="title function_ invoke__">sleep</span>(duration);
+            waker_clone.<span class="title function_ invoke__">wake</span>();
+        &#125;);
+        <span class="keyword">self</span>.timeout = <span class="literal">true</span>;
+        Poll::Pending
+    &#125;
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">waker0</span> = SimpleWaker::<span class="title function_ invoke__">empty</span>();
+    <span class="keyword">let</span> <span class="variable">waker</span> = waker0.<span class="title function_ invoke__">clone</span>();
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">generator</span> = <span class="keyword">move</span> || &#123;
+        <span class="built_in">println!</span>(<span class="string">&quot;test start&quot;</span>);
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">vec</span> = <span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">timer</span> = SimpleTimeout &#123;
+            duration: Duration::<span class="title function_ invoke__">from_secs</span>(<span class="number">1</span>),
+            timeout: <span class="literal">false</span>,
+        &#125;;
+        <span class="keyword">loop</span> &#123;
+            <span class="keyword">match</span> Pin::<span class="title function_ invoke__">new</span>(&amp;<span class="keyword">mut</span> timer).<span class="title function_ invoke__">poll</span>(&amp;waker) &#123;
+                Poll::<span class="title function_ invoke__">Ready</span>(()) =&gt; &#123;
+                    <span class="keyword">break</span>;
+                &#125;
+                Poll::Pending =&gt; &#123;
+                    <span class="title function_ invoke__">yield</span> ();
+                &#125;
+            &#125;
+        &#125;
+        vec.<span class="title function_ invoke__">push</span>(<span class="number">4</span>);
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;:?&#125;&quot;</span>, vec);
+        <span class="keyword">let</span> <span class="variable">display</span> = <span class="built_in">format!</span>(<span class="string">&quot;&#123;:?&#125;&quot;</span>, vec);
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">timer</span> = SimpleTimeout &#123;
+            duration: Duration::<span class="title function_ invoke__">from_secs</span>(<span class="number">1</span>),
+            timeout: <span class="literal">false</span>,
+        &#125;;
+        <span class="keyword">loop</span> &#123;
+            <span class="keyword">match</span> Pin::<span class="title function_ invoke__">new</span>(&amp;<span class="keyword">mut</span> timer).<span class="title function_ invoke__">poll</span>(&amp;waker) &#123;
+                Poll::<span class="title function_ invoke__">Ready</span>(()) =&gt; &#123;
+                    <span class="keyword">break</span>;
+                &#125;
+                Poll::Pending =&gt; &#123;
+                    <span class="title function_ invoke__">yield</span> ();
+                &#125;
+            &#125;
+        &#125;
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, display);
+        <span class="built_in">println!</span>(<span class="string">&quot;test end&quot;</span>);
+        <span class="title function_ invoke__">return</span> ();
+    &#125;;
+    waker0.<span class="title function_ invoke__">set_wake_fn</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(<span class="keyword">move</span> || &#123;
+        Pin::<span class="title function_ invoke__">new</span>(&amp;<span class="keyword">mut</span> generator).<span class="title function_ invoke__">resume</span>(());
+    &#125;));
+    waker0.<span class="title function_ invoke__">wake</span>();
+    <span class="keyword">let</span> (_tx, rx) = std::sync::mpsc::channel::&lt;()&gt;();
+    _ = rx.<span class="title function_ invoke__">recv</span>();
+&#125;
+</code></pre>
+
+<p>上述代码中，我们在simulate()中定义了一个生成器，并通过状态机解释了编译之后的结果，然后手动调用<code>resume()</code>方法，尝试切换状态，并以此推进执行，得到的输出和预期一致。</p>
+<p>这里留意到出现了Pin和指针，而不是引用。关于为什么使用指针，是因为在需要使用引用时，生命周期无法工作，所以我们使用原生指针并手动控制指针的释放和获取。</p>
+<p>此外Pin因于<strong>自引用</strong>的存在而存在，下面会提及。</p>
+<h4 id="Async-Await"><a href="#Async-Await" class="headerlink" title="Async&#x2F;Await"></a>Async&#x2F;Await</h4><p>前面说到Rust异步的实现和生成器的实现很像，都需要保存状态，都会分阶段运行，不同之处在于async&#x2F;await实现了跨保存点引用，具体实现方式则是<strong>指针+Pin</strong>；而是用<code>Pin</code>的原因很简单，因为<strong>指针会产生自引用类型，需要Pin保证自引用类型的有效性</strong>。</p>
+<p>在异步中，当触发保存点保存上下文时，如果出现了<strong>跨包存点的引用</strong>(因为yield保存的上下文其实是此语句后面的状态)，则改为裸指针处理，并且把被指向的值一同保存在当前状态中(不然因为生命周期而导致被指向数据销毁，指针非法)。但是这就产生了<strong>自引用</strong>，所以需要Pin来固定。想象一下，如果这个值被移动，那么指针指向的数据也不再得到合法性保证了不是吗，所以最简单的方式就是不要让它移动。</p>
+<h4 id="Pin"><a href="#Pin" class="headerlink" title="Pin"></a>Pin</h4><p>Pin的主要作用是保证被指向数据的不可移动，当尝试move一个被Pin修饰的变量时，会触发一个异常，关于Pin的实现则是由编译器进行保证，比较简单。</p>
+<p>而想要实现Pin则在需要被Pin的类型上追加一个大小为0的标记字段，其类型为<code>PhantomPinned</code>。在Rust中，类型默认是<code>Unpin</code>的，即可以随便的<code>move</code>。包含了<code>Pin</code>字段的类型会自动实现<code>Pin</code>。</p>
+<p>被Pin的指针根据指向数据的位置分为：</p>
+<ul>
+<li>栈上Pin：被Pin的数据保存在栈上，所以无法在<code>new</code>方法设置自引用字段，需要在得到实例之后再次设置自引用字段的值。而且涉及到的一些操作会是<code>unsafe</code>的；此外还需要注意被提前释放的Pin，并不会释放背后的变量，所以在<code>drop(Pin)</code>之后并不会影响通过原本引用的访问，而这可能产生一些意料之外的问题，所以需要额外的精力去留意。</li>
+<li>堆上Pin：相比之外就简单一些，但是这是部分的性能牺牲换来的。</li>
+</ul>
+<p>具体细节见<a target="_blank" rel="noopener" href="https://rust-lang.github.io/async-book/04_pinning/01_chapter.html">Pinning</a>。这里我们说一下Pin到底是什么？</p>
+<p>首先Pin类型只有一个字段，即需要被固定的数据的<strong>可变引用</strong>类型。所以Pin固定的是某个引用背后的数据。</p>
+<p>既然这里需要引用，那么构造得到的<strong>Pin实例的生命周期</strong>(关于对象和引用的生命周期详见之前的笔记)就<strong>不可以大于需要被固定的引用的生命周期</strong>。</p>
+<p>堆上分配本身得到的就是一个引用，直接拿着这个引用去构造Pin，得到的实例可以实现所有权转移，因为Box包含的数据不会被<code>move</code>，这里仅仅是移动了Box类型。而栈上数据会直接移动整个变量，这也是Pin在栈上和堆上的一点不同。</p>
+<p>最后为了性能，给出一个建议就是，能Pin在栈上就Pin在栈上。除非本身就是Pin的或者想要在Pin之后依旧移动所有权(不是移动数据)。</p>
+<h5 id="2023-06-01追加"><a href="#2023-06-01追加" class="headerlink" title="2023-06-01追加"></a>2023-06-01追加</h5><p>这里追加一点关于为什么Future::poll()需要Pin&lt;&amp;mut Self&gt;的理解，什么自引用类型就不多介绍了。首先Pin没有那么神奇，它是一个条条框框，一个约束，或者说一个限制性接口。Pin本身是作用于指针的，我们称为P，如果P指向的类型(称为T)实现了Unpin，那么Pin<P>和&amp;P没什么区别，Pin<mut P>&#x2F;&amp;mut P同理。但是如果T实现了!Unpin，即T需要被钉住，则Pin&lt;P&#x2F;mut P&gt;只会暴露出不可变引用的方法，通过这种禁止得到可变引用的方式杜绝了外部使用mem::swap()等类似方法移动T的可能。</p>
+<p>这就是Pin最大的约束，简而言之，通过使用Pin包裹T的引用，可以在T“不愿意”被移动的前提下隐藏可变引用，进而帮助T实现不愿意移动的愿望。一个Future可能会根据多个阶段生成多个状态保存结构体，这里的结构体不是每一个都是自引用的，甚至有时全部都是Unpin的。</p>
+<p>另外，Future在被poll之前是可以移动的，因为此时没有任何状态生成，也就不存在因为移动导致自引用失败的可能，所以在生成一个Future之后可以自由的move，Send between threads。而一旦poll开始，则可能产生了自引用结构体，此时move整个Future则会造成崩溃，所以此时Future能对外暴露的所有方法必定是Pin修饰过的。</p>
+<p>Pin本身没什么难的，只是第一次接触会被各种文章和概念绕晕，它的作用和意义很简单，也很直白。</p>
+<h4 id="Future"><a href="#Future" class="headerlink" title="Future"></a>Future</h4><p>到目前为止，我们介绍了所有Future实现需要的细节：</p>
+<ul>
+<li>分段执行</li>
+<li>阶段性局部变量保存</li>
+<li>自引用合法性保证</li>
+</ul>
+<p>剩下的就是对比Future和Generator然后硬编码尝试实现一个Future。</p>
+<p>当然还有一个调度和唤醒的细节，放在后面提及。</p>
+<p>前面提及Future分为<strong>叶子Future</strong>和<strong>非叶子Future</strong>，其中非叶子Future包含其他Future，而<strong>非叶子Future的执行需要等待内嵌的Future的执行</strong>，即xxx().await；而如果某个异步方法没有就绪，则需要释放CPU使用权，即**在当前<code>.await</code>位置<code>yield</code>**，然后等到就绪之后再次推进。</p>
+<p>看！这是不是把Future和Generator对应起来了？**<code>yield</code>需要释放CPU保存执行上下文<strong>，同样无法推进的</strong><code>.await</code>操作也需要释放CPU，保存上下文**。</p>
+<p>所以它们在实现上基本一致，也是通过状态机实现，每一个<code>.await</code>的成功推进对应一个状态的转移。同时在状态枚举值保存目前的上下文变量。</p>
+<p>分析完非叶子节点，接下来是叶子结点的处理，<strong>叶子Future本身不包含任何<code>.await</code>操作</strong>，所以也就不存在保存上下文等编译器行为。</p>
+<p>对它们的处理很简单，因为它们<strong>只会返回<code>Poll::Pending/Poll::Ready</code>两种结果</strong>，在调度器得到<code>Poll::Pending</code>结果时，切换到另一个Future即可。而在调度器被<code>Waker</code>唤醒时，重新执行叶子Future的<code>poll()</code>方法进行轮询。</p>
+<p>所以这里的叶子Future在实现上最好<strong>把就绪检测放在<code>poll()</code>的开始</strong>，避免重复执行过多的不必要部分。</p>
+<p>但是这里又有一个疑问，非叶子Future得到叶子Future的<code>Poll::Pending</code>结果之后，怎么处理呢？肯定不可能重新执行非叶子Future吧！那么最好就是在<code>.await</code>这里保存一下上下文，并且返回这个<code>Poll::Pending</code>结果，等到下次调用非Future的poll()方法时，继续这个位置执行。这里给出一个可能的实现：</p>
+<pre><code class="highlight rust"><span class="keyword">async</span> <span class="keyword">fn</span> <span class="title function_">poll</span>() &#123;
+    <span class="title function_ invoke__">aaa</span>();
+    <span class="title function_ invoke__">bbb</span>();
+    <span class="keyword">let</span> <span class="variable">ans</span> = ();
+    <span class="keyword">loop</span> &#123;
+        <span class="keyword">let</span> <span class="variable">res</span> = some_future.<span class="title function_ invoke__">poll</span>(cx);
+        <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Poll</span>::Pending = res &#123;
+            <span class="keyword">yield</span> Poll::Pending; <span class="comment">// pause execution of code, and reture Pending result to scheduler</span>
+        &#125; <span class="keyword">else</span> &#123;
+            ans = res.<span class="title function_ invoke__">take</span>();
+            <span class="keyword">break</span>;
+        &#125;
+    &#125;
+    <span class="title function_ invoke__">ccc</span>(ans);
+    <span class="title function_ invoke__">ddd</span>();
+&#125;</code></pre>
+
+<h4 id="await-or-yield-poll-or-resume"><a href="#await-or-yield-poll-or-resume" class="headerlink" title="await or yield &#x2F; poll() or resume()"></a>await or yield &#x2F; poll() or resume()</h4><p>现在试着把生成器和异步对应起来了。每一个await对应一个yield，await返回<code>Poll::Pending</code>时，则yield一个Pending，并保存上下文，就像上面提及的一样。await返回<code>Poll::Ready</code>时，则继续推进执行。</p>
+<p>每一次的<code>poll()</code>调用，就像针对生成器调用<code>resume()</code>一样。尝试推进一次状态，当然也可能从<code>Pending</code>依旧转移到<code>Pending</code>。</p>
+<p>这里给出一个通过生成器模拟Future的异步计数器例子：</p>
+<pre><code class="highlight rust"><span class="keyword">use</span> std::ops::Generator;
+<span class="keyword">use</span> std::pin::Pin;
+<span class="keyword">use</span> std::sync::&#123;Arc, Mutex&#125;;
+<span class="keyword">use</span> std::sync::mpsc::channel;
+<span class="keyword">use</span> std::thread::&#123;sleep, spawn&#125;;
+<span class="keyword">use</span> std::time::Duration;
+
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">timer_func</span>() &#123;
+    <span class="keyword">let</span> (sender, receiver) = <span class="title function_ invoke__">channel</span>();
+    <span class="keyword">let</span> (tx, rx) = <span class="title function_ invoke__">channel</span>();
+    <span class="comment">// spawn new Future</span>
+    <span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+        <span class="keyword">let</span> <span class="variable">gen</span> = || &#123;
+            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">timeout</span> = <span class="number">1</span>;
+            timeout *= <span class="number">2</span>;
+            <span class="built_in">println!</span>(<span class="string">&quot;start timer&quot;</span>);
+            <span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+                <span class="title function_ invoke__">sleep</span>(Duration::<span class="title function_ invoke__">from_secs</span>(timeout));
+                <span class="keyword">let</span> <span class="variable">_</span> = sender.<span class="title function_ invoke__">send</span>(());
+            &#125;);
+            <span class="comment">// compiler will save execute context, such as, value of timeout</span>
+            <span class="comment">// and the loose the control of this thread</span>
+            <span class="keyword">yield</span> timeout;
+            <span class="built_in">println!</span>(<span class="string">&quot;timer done with timeout: &#123;&#125;&quot;</span>, timeout);
+        &#125;;
+        <span class="comment">// send simulated Future to executor thread</span>
+        tx.<span class="title function_ invoke__">send</span>(gen).<span class="title function_ invoke__">unwrap</span>();
+    &#125;);
+
+    <span class="comment">// executor get new Future</span>
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">gen</span> = rx.<span class="title function_ invoke__">recv</span>().<span class="title function_ invoke__">unwrap</span>();
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">gen</span> = Pin::<span class="title function_ invoke__">new</span>(&amp;<span class="keyword">mut</span> gen);
+    <span class="comment">// each resume() will run the code in generator until encounter yield</span>
+    <span class="comment">// and the next resume() will resume execution of the code in generator from last yield(beginning if first call)</span>
+    gen.<span class="title function_ invoke__">as_mut</span>().<span class="title function_ invoke__">resume</span>(());
+    <span class="keyword">loop</span> &#123;
+        <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Ok</span>(_) = receiver.<span class="title function_ invoke__">recv</span>() &#123;
+            gen.<span class="title function_ invoke__">as_mut</span>().<span class="title function_ invoke__">resume</span>(());
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="keyword">break</span>
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+<p>还记得我们前面说的Future调用关系图里面的箭头吗？那些包含不同小箭头的Task(一种实现了Future的类型)，则是表示对于子Future的调用并在返回<code>Poll::Pending</code>时循环，不过会释放CPU。而每一个分支最下面的Task的箭头指向了最开始，表示他们是叶子Future，且会在每一次调用时重新判断就绪状态。</p>
+<h4 id="Waker"><a href="#Waker" class="headerlink" title="Waker"></a>Waker</h4><p>最后的叶子Future就绪时，怎么触发再次poll()呢？肯定不能让执行器loop吧！所以需要一个通知机制，在这里就是Waker。</p>
+<p>Rust对于Waker并没有限制其实现，而是仅仅给出了标准，具体实现取决于运行时的偏好。对于Waker，我们有如下结构：</p>
+<p><img src="/2024/01/08/Rust%E5%BC%82%E6%AD%A5/waker.svg"></p>
+<p>Rust并没有使用特征对象实现Waker，而是使用了硬编码的虚方法表和数据域，也就是胖纸针类型。首先是Context包裹了一个Waker类型，之所以不直接使用是为了日后扩展Context。</p>
+<p>而Waker则包含一个RawWaker，而RawWaker则是由运行时具体实现的Waker，RawWaker包含一个数据域和一个虚方法表，用来实现类似动态派发的功能，这么做的原因是因为某些嵌入式系统不支持特征对象。</p>
+<p>RawWaker正如一个特征对象一个，有两个字段，大小为2*sizeof(uzise)，64位机就是16字节；胖纸针，对吧？</p>
+<p>针对每一个Future，运行时会创建一个Task，用来包裹Waker和Future，或者说，Task实现了Future，同时包含Waker字段。而在poll方法里的合适的地方，调用waker.wake()方法，触发调度器的再调度。</p>
+<p>一般来说Waker的实现可能有：</p>
+<ul>
+<li>Task ID的形式：针对每一个Task基于一个ID，并通过waker传递ID给执行器，告诉它哪个Task就绪了。</li>
+<li>引用计数：这也是最多实现的形式，Waker本身在数据域保存一个对应Task的引用(通过Arc这样的形式)，并在就绪时把这个引用添加到可执行队列中。一般唤醒器会在多个线程之间传递，比如调度线程和工作线程，所以会使用Arc做同步。</li>
+</ul>
+<h4 id="Executor"><a href="#Executor" class="headerlink" title="Executor"></a>Executor</h4><p>负责生成Task，调度Task，绑定Waker等。</p>
+<p>这里给出一个可能的调度器，Waker等实现：</p>
+<pre><code class="highlight rust"><span class="keyword">use</span> std::collections::&#123;hash_map, HashMap&#125;;
+<span class="keyword">use</span> std::future::Future;
+<span class="keyword">use</span> std::mem::&#123;forget, replace&#125;;
+<span class="keyword">use</span> std::pin::Pin;
+<span class="keyword">use</span> std::sync::&#123;Arc, Mutex&#125;;
+<span class="keyword">use</span> std::sync::mpsc::&#123;channel, Sender&#125;;
+<span class="keyword">use</span> std::task::&#123;Context, Poll, RawWaker, RawWakerVTable, Waker&#125;;
+<span class="keyword">use</span> std::thread::&#123;JoinHandle, spawn, sleep, Thread, current, park&#125;;
+<span class="keyword">use</span> std::time::Duration;
+
+<span class="keyword">enum</span> <span class="title class_">Event</span> &#123;
+    Close,
+    <span class="title function_ invoke__">Timeout</span>(<span class="type">u64</span>, <span class="type">usize</span>),
+&#125;
+
+<span class="keyword">enum</span> <span class="title class_">TaskState</span> &#123;
+    <span class="title function_ invoke__">Polling</span>(Waker),
+    Ready,
+    Finished,
+&#125;
+
+<span class="keyword">struct</span> <span class="title class_">Reactor</span> &#123;
+    <span class="comment">// send event to executor thread</span>
+    <span class="comment">// 发送给执行线程的Sender</span>
+    dispatcher: Sender&lt;Event&gt;,
+    handle: <span class="type">Option</span>&lt;JoinHandle&lt;()&gt;&gt;,
+    <span class="comment">// the map of task id and task state</span>
+    <span class="comment">// 任务id和任务状态的映射</span>
+    tasks: HashMap&lt;<span class="type">usize</span>, TaskState&gt;
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Reactor</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> Arc&lt;Mutex&lt;<span class="type">Box</span>&lt;<span class="keyword">Self</span>&gt;&gt;&gt; &#123;
+        <span class="keyword">let</span> (sender, receiver) = <span class="title function_ invoke__">channel</span>();
+        <span class="keyword">let</span> <span class="variable">reactor</span> = Arc::<span class="title function_ invoke__">new</span>(Mutex::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(Reactor &#123;
+            dispatcher: sender,
+            handle: <span class="literal">None</span>,
+            tasks: HashMap::<span class="title function_ invoke__">new</span>(),
+        &#125;)));
+        <span class="keyword">let</span> <span class="variable">clone</span> = Arc::<span class="title function_ invoke__">downgrade</span>(&amp;reactor);
+        <span class="keyword">let</span> <span class="variable">handle</span> = <span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+            <span class="comment">// join all timer thread by this vector</span>
+            <span class="comment">// 通过这个Vec来join所有的定时器线程</span>
+            <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">handles</span> = <span class="built_in">vec!</span>[];
+            <span class="keyword">for</span> <span class="variable">event</span> <span class="keyword">in</span> receiver &#123;
+                <span class="keyword">let</span> <span class="variable">reactor</span> = clone.<span class="title function_ invoke__">clone</span>();
+                <span class="keyword">match</span> event &#123;
+                    Event::Close =&gt; &#123;
+                        <span class="keyword">break</span>;
+                    &#125;
+                    Event::<span class="title function_ invoke__">Timeout</span>(timeout, id) =&gt; &#123;
+                        <span class="keyword">let</span> <span class="variable">event_handle</span> = <span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+                            <span class="title function_ invoke__">sleep</span>(Duration::<span class="title function_ invoke__">from_secs</span>(timeout));
+                            <span class="comment">// it&#x27;s time to wake up.</span>
+                            <span class="keyword">let</span> <span class="variable">reactor</span> = reactor.<span class="title function_ invoke__">upgrade</span>().<span class="title function_ invoke__">unwrap</span>();
+                            reactor.<span class="title function_ invoke__">lock</span>().<span class="title function_ invoke__">map</span>(|<span class="keyword">mut</span> rect| rect.<span class="title function_ invoke__">wake</span>(id)).<span class="title function_ invoke__">unwrap</span>();
+                        &#125;);
+                        handles.<span class="title function_ invoke__">push</span>(event_handle);
+                    &#125;
+                &#125;
+            &#125;
+            <span class="comment">// join all timer thread</span>
+            <span class="comment">// join所有的定时器线程</span>
+            handles.<span class="title function_ invoke__">into_iter</span>().for_each(|handle| handle.<span class="title function_ invoke__">join</span>().<span class="title function_ invoke__">unwrap</span>());
+        &#125;);
+        reactor.<span class="title function_ invoke__">lock</span>().<span class="title function_ invoke__">map</span>(|<span class="keyword">mut</span> rect| rect.handle = <span class="title function_ invoke__">Some</span>(handle)).<span class="title function_ invoke__">unwrap</span>();
+        reactor
+    &#125;
+
+    <span class="comment">// the wake is trying to transfer the task state</span>
+    <span class="comment">// and that is how the fsm work with Future in Rust.</span>
+    <span class="comment">// wake方法尝试转换任务状态，这就是Rust如何使用fsm来实现Future的。</span>
+    <span class="keyword">fn</span> <span class="title function_">wake</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, id: <span class="type">usize</span>) &#123;
+        <span class="keyword">let</span> <span class="variable">state</span> = <span class="keyword">self</span>.tasks.<span class="title function_ invoke__">get_mut</span>(&amp;id).<span class="title function_ invoke__">unwrap</span>();
+        <span class="comment">// update corresponding task state</span>
+        <span class="comment">// 更新对应的任务状态</span>
+        <span class="keyword">match</span> <span class="title function_ invoke__">replace</span>(state, TaskState::Ready) &#123;
+            <span class="comment">// wake with the waker bound on the event</span>
+            <span class="comment">// 用绑定在事件上的waker唤醒</span>
+            TaskState::<span class="title function_ invoke__">Polling</span>(waker) =&gt; &#123;
+                waker.<span class="title function_ invoke__">wake</span>();
+            &#125;,
+            TaskState::Finished =&gt; &#123;
+                <span class="built_in">panic!</span>(<span class="string">&quot;task already finished&quot;</span>);
+            &#125;,
+            _ =&gt; &#123;&#125;
+        &#125;
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">register</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, timeout: <span class="type">u64</span>, waker: Waker, id: <span class="type">usize</span>) &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.tasks.<span class="title function_ invoke__">insert</span>(id, TaskState::<span class="title function_ invoke__">Polling</span>(waker)).<span class="title function_ invoke__">is_some</span>() &#123;
+            <span class="built_in">panic!</span>(<span class="string">&quot;task already registered&quot;</span>);
+        &#125;
+        <span class="keyword">self</span>.dispatcher.<span class="title function_ invoke__">send</span>(Event::<span class="title function_ invoke__">Timeout</span>(timeout, id)).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;send channel broken down&quot;</span>);
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">is_ready</span>(&amp;<span class="keyword">self</span>, id: <span class="type">usize</span>) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;
+        <span class="keyword">match</span> <span class="keyword">self</span>.tasks.<span class="title function_ invoke__">get</span>(&amp;id) &#123;
+            <span class="title function_ invoke__">Some</span>(TaskState::Ready) =&gt; <span class="literal">true</span>,
+            _ =&gt; <span class="literal">false</span>,
+        &#125;
+    &#125;
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Drop</span> <span class="keyword">for</span> <span class="title class_">Reactor</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">drop</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;
+        <span class="comment">// close executor thread</span>
+        <span class="comment">// 关闭执行线程</span>
+        <span class="keyword">self</span>.dispatcher.<span class="title function_ invoke__">send</span>(Event::Close).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;send channel broken down&quot;</span>);
+        <span class="comment">// waiting for remaining work</span>
+        <span class="comment">// 等待剩余的工作执行</span>
+        <span class="keyword">self</span>.handle.<span class="title function_ invoke__">take</span>().<span class="title function_ invoke__">map</span>(|handle| handle.<span class="title function_ invoke__">join</span>().<span class="title function_ invoke__">unwrap</span>()).<span class="title function_ invoke__">expect</span>(<span class="string">&quot;reactor thread already joined&quot;</span>);
+    &#125;
+&#125;
+
+<span class="keyword">struct</span> <span class="title class_">MyWaker</span> &#123;
+    thread_handle: Thread,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">MyWaker</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">wake</span>(&amp;<span class="keyword">self</span>) &#123;
+        <span class="keyword">self</span>.thread_handle.<span class="title function_ invoke__">unpark</span>();
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">clone</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> RawWaker &#123;
+        <span class="keyword">let</span> <span class="variable">arc</span> = <span class="keyword">unsafe</span> &#123; Arc::<span class="title function_ invoke__">from_raw</span>(<span class="keyword">self</span>) &#125;;
+        <span class="comment">// just increase the reference count, decrease it when drop</span>
+        <span class="comment">// 只增加引用计数，drop时会再减回去</span>
+        forget(arc.<span class="title function_ invoke__">clone</span>());
+        <span class="comment">// all the waker here share the same data field</span>
+        <span class="comment">// 所有的waker都共享同一个数据域</span>
+        RawWaker::<span class="title function_ invoke__">new</span>(Arc::<span class="title function_ invoke__">into_raw</span>(arc) <span class="keyword">as</span> *<span class="title function_ invoke__">const</span> (), &amp;VTABLE)
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">into</span>(waker: *<span class="keyword">const</span> MyWaker) <span class="punctuation">-&gt;</span> Waker &#123;
+        <span class="keyword">let</span> <span class="variable">raw_waker</span> = RawWaker::<span class="title function_ invoke__">new</span>(waker <span class="keyword">as</span> *<span class="title function_ invoke__">const</span> (), &amp;VTABLE);
+        <span class="keyword">unsafe</span> &#123; Waker::<span class="title function_ invoke__">from_raw</span>(raw_waker) &#125;
+    &#125;
+&#125;
+
+<span class="keyword">const</span> VTABLE: RawWakerVTable = <span class="keyword">unsafe</span> &#123;
+    RawWakerVTable::<span class="title function_ invoke__">new</span>(
+        |data| &#123;
+            MyWaker::<span class="title function_ invoke__">clone</span>(&amp;(*(data <span class="keyword">as</span> *<span class="keyword">const</span> MyWaker)))
+        &#125;,
+        |data| &#123;
+            MyWaker::<span class="title function_ invoke__">wake</span>(&amp;(*(data <span class="keyword">as</span> *<span class="keyword">const</span> MyWaker)))
+        &#125;,
+        |data| &#123;
+            &amp;(*(data <span class="keyword">as</span> *<span class="keyword">const</span> MyWaker)).thread_handle.<span class="title function_ invoke__">unpark</span>();
+        &#125;,
+        |data| &#123;
+            <span class="title function_ invoke__">drop</span>(Arc::<span class="title function_ invoke__">from_raw</span>(data <span class="keyword">as</span> *<span class="keyword">const</span> MyWaker));
+        &#125;,
+    )
+&#125;;
+
+<span class="keyword">struct</span> <span class="title class_">MyTask</span> &#123;
+    id: <span class="type">usize</span>,
+    reactor: Arc&lt;Mutex&lt;<span class="type">Box</span>&lt;Reactor&gt;&gt;&gt;,
+    data: <span class="type">u64</span>,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">MyTask</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">new</span>(id: <span class="type">usize</span>, reactor: Arc&lt;Mutex&lt;<span class="type">Box</span>&lt;Reactor&gt;&gt;&gt;, data: <span class="type">u64</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;
+        <span class="keyword">Self</span> &#123; id, reactor, data &#125;
+    &#125;
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Future</span> <span class="keyword">for</span> <span class="title class_">MyTask</span> &#123;
+    <span class="keyword">type</span> <span class="title class_">Output</span> = <span class="type">usize</span>;
+
+    <span class="comment">// this method can be invoked many times</span>
+    <span class="comment">// 这个方法可能会被多次调用</span>
+    <span class="keyword">fn</span> <span class="title function_">poll</span>(<span class="keyword">self</span>: Pin&lt;&amp;<span class="keyword">mut</span> <span class="keyword">Self</span>&gt;, cx: &amp;<span class="keyword">mut</span> Context&lt;<span class="symbol">&#x27;_</span>&gt;) <span class="punctuation">-&gt;</span> Poll&lt;<span class="keyword">Self</span>::Output&gt; &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">reactor</span> = <span class="keyword">self</span>.reactor.<span class="title function_ invoke__">lock</span>().<span class="title function_ invoke__">unwrap</span>();
+        <span class="keyword">if</span> reactor.<span class="title function_ invoke__">is_ready</span>(<span class="keyword">self</span>.id) &#123;
+            *reactor.tasks.<span class="title function_ invoke__">get_mut</span>(&amp;<span class="keyword">self</span>.id).<span class="title function_ invoke__">unwrap</span>() = TaskState::Finished;
+            Poll::<span class="title function_ invoke__">Ready</span>(<span class="keyword">self</span>.id)
+        &#125; <span class="keyword">else</span> <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">hash_map</span>::Entry::<span class="title function_ invoke__">Occupied</span>(<span class="keyword">mut</span> e) = reactor.tasks.<span class="title function_ invoke__">entry</span>(<span class="keyword">self</span>.id) &#123;
+            <span class="comment">// on each invoke, the corresponding waker will be updated</span>
+            <span class="comment">// the old waker will be dropped.</span>
+            <span class="comment">// 每次调用时，对应的waker都会被更新，旧的waker会被丢弃</span>
+            e.<span class="title function_ invoke__">insert</span>(TaskState::<span class="title function_ invoke__">Polling</span>(cx.<span class="title function_ invoke__">waker</span>().<span class="title function_ invoke__">clone</span>()));
+            Poll::Pending
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="comment">// in the first invoke, a pair of id-task_state will be inserted into the map</span>
+            <span class="comment">// 在第一次调用时，一个id-task_state会被插入到map中</span>
+            reactor.<span class="title function_ invoke__">register</span>(<span class="keyword">self</span>.data, cx.<span class="title function_ invoke__">waker</span>().<span class="title function_ invoke__">clone</span>(), <span class="keyword">self</span>.id);
+            Poll::Pending
+        &#125;
+    &#125;
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">block_on</span>&lt;F&gt;(<span class="keyword">mut</span> future: F) <span class="punctuation">-&gt;</span> F::Output
+    <span class="keyword">where</span> F: Future &#123;
+    <span class="keyword">let</span> <span class="variable">current_thread</span> = <span class="title function_ invoke__">current</span>();
+    <span class="comment">// all timer share the same waker</span>
+    <span class="comment">// 所有的定时器共享同一个waker，是为了简单设计</span>
+    <span class="keyword">let</span> <span class="variable">my_waker</span> = Arc::<span class="title function_ invoke__">new</span>(MyWaker &#123; thread_handle: current_thread &#125;);
+    <span class="keyword">let</span> <span class="variable">waker</span> = MyWaker::<span class="title function_ invoke__">into</span>(Arc::<span class="title function_ invoke__">into_raw</span>(my_waker));
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">context</span> = Context::<span class="title function_ invoke__">from_waker</span>(&amp;waker);
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">future</span> = <span class="keyword">unsafe</span> &#123;Pin::<span class="title function_ invoke__">new_unchecked</span>(&amp;<span class="keyword">mut</span> future) &#125;;
+    <span class="keyword">loop</span> &#123;
+        <span class="keyword">match</span> Future::<span class="title function_ invoke__">poll</span>(future.<span class="title function_ invoke__">as_mut</span>(), &amp;<span class="keyword">mut</span> context) &#123;
+            Poll::Pending =&gt; &#123;
+                <span class="title function_ invoke__">park</span>();
+            &#125;,
+            Poll::<span class="title function_ invoke__">Ready</span>(value) =&gt; &#123;
+                <span class="keyword">break</span> value
+            &#125;
+        &#125;;
+    &#125;
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">run</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">reactor</span> = Reactor::<span class="title function_ invoke__">new</span>();
+    <span class="keyword">let</span> <span class="variable">task1</span> = MyTask::<span class="title function_ invoke__">new</span>(<span class="number">1</span>, reactor.<span class="title function_ invoke__">clone</span>(), <span class="number">1</span>);
+    <span class="keyword">let</span> <span class="variable">task2</span> = MyTask::<span class="title function_ invoke__">new</span>(<span class="number">2</span>, reactor.<span class="title function_ invoke__">clone</span>(), <span class="number">2</span>);
+    <span class="keyword">let</span> <span class="variable">f</span> = <span class="keyword">async</span> &#123;
+        <span class="keyword">let</span> <span class="variable">a</span> = task1.<span class="keyword">await</span>;
+        <span class="built_in">println!</span>(<span class="string">&quot;task&#123;&#125; finished&quot;</span>, a);
+        <span class="keyword">let</span> <span class="variable">b</span> = task2.<span class="keyword">await</span>;
+        <span class="built_in">println!</span>(<span class="string">&quot;task&#123;&#125; finished&quot;</span>, b);
+    &#125;;
+    <span class="title function_ invoke__">block_on</span>(f);
+    <span class="comment">// after here, reactor has been destroyed, and the drop method will be called.</span>
+    <span class="comment">// which means the timer loop will be broken and all timer thread will run.</span>
+    <span class="comment">// 在这里，reactor已经被销毁，drop方法会被调用，定时器循环会被打断，所有的定时器线程都会运行</span>
+&#125;</code></pre>
+
+<h4 id="一个更加完整的使用生成器模拟Future的例子："><a href="#一个更加完整的使用生成器模拟Future的例子：" class="headerlink" title="一个更加完整的使用生成器模拟Future的例子："></a>一个更加完整的使用生成器模拟Future的例子：</h4><pre><code class="highlight rust"><span class="meta">#![feature(generator_trait)]</span>
+<span class="meta">#![feature(generators)]</span>
+
+<span class="keyword">use</span> std::future::Future;
+<span class="keyword">use</span> std::ops::&#123;Generator, GeneratorState&#125;;
+<span class="keyword">use</span> std::pin::Pin;
+<span class="keyword">use</span> std::sync::Arc;
+<span class="keyword">use</span> std::task::&#123;Context, Poll, RawWaker, RawWakerVTable, Waker&#125;;
+<span class="keyword">use</span> std::time::Duration;
+<span class="keyword">use</span> tokio::time::Instant;
+
+<span class="keyword">struct</span> <span class="title class_">Timer</span> &#123;
+    delay_sec: <span class="type">u64</span>,
+    when: Instant,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Timer</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">new</span>(delay_sec: <span class="type">u64</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;
+        Timer &#123;
+            delay_sec,
+            when: Instant::<span class="title function_ invoke__">now</span>() + Duration::<span class="title function_ invoke__">from_secs</span>(delay_sec),
+        &#125;
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">poll</span>(<span class="keyword">self</span>: Pin&lt;&amp;<span class="keyword">mut</span> <span class="keyword">Self</span>&gt;, waker: Waker) <span class="punctuation">-&gt;</span> Poll&lt;<span class="type">String</span>&gt; &#123;
+        <span class="keyword">return</span> <span class="keyword">if</span> Instant::<span class="title function_ invoke__">now</span>() &gt;= <span class="keyword">self</span>.when &#123;
+            Poll::<span class="title function_ invoke__">Ready</span>(<span class="built_in">format!</span>(<span class="string">&quot;run after &#123;&#125; seconds&quot;</span>, <span class="keyword">self</span>.delay_sec))
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="keyword">let</span> <span class="variable">delay_sec</span> = <span class="keyword">self</span>.delay_sec;
+            std::thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+                std::thread::<span class="title function_ invoke__">sleep</span>(Duration::<span class="title function_ invoke__">from_secs</span>(delay_sec));
+                waker.<span class="title function_ invoke__">wake</span>();
+            &#125;);
+            Poll::Pending
+        &#125;
+    &#125;
+&#125;
+
+<span class="keyword">struct</span> <span class="title class_">Task</span> &#123;
+    <span class="comment">// 简单起见，不用Context，不然会引入一大堆生命周期问题</span>
+    generator: Pin&lt;<span class="type">Box</span>&lt;<span class="keyword">dyn</span> Generator&lt;Waker, Yield=Poll&lt;()&gt;, Return=()&gt;&gt;&gt;,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Task</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">new</span>(delay_queue: <span class="type">Vec</span>&lt;<span class="type">u64</span>&gt;) <span class="punctuation">-&gt;</span> Task &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">gen</span> = <span class="keyword">move</span> |waker: Waker| &#123;
+            <span class="built_in">println!</span>(<span class="string">&quot;task running...&quot;</span>);
+            <span class="keyword">for</span> <span class="variable">delay</span> <span class="keyword">in</span> delay_queue.<span class="title function_ invoke__">into_iter</span>() &#123;
+                <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">timer</span> = Timer::<span class="title function_ invoke__">new</span>(delay);
+                <span class="comment">// 最核心的在这里，这里大概展示了 非叶子Future是怎么把await转换成yield操作的</span>
+                <span class="keyword">loop</span> &#123;
+                    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">timer_mut</span> = &amp;<span class="keyword">mut</span> timer;
+                    <span class="keyword">let</span> <span class="variable">timer_pin</span> = Pin::<span class="title function_ invoke__">new</span>(timer_mut);
+                    <span class="keyword">let</span> <span class="variable">poll_res</span> = timer_pin.<span class="title function_ invoke__">poll</span>(waker.<span class="title function_ invoke__">clone</span>());
+                    <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Poll</span>::<span class="title function_ invoke__">Ready</span>(<span class="type">str</span>) = poll_res &#123;
+                        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, <span class="type">str</span>);
+                        <span class="keyword">break</span>;
+                    &#125; <span class="keyword">else</span> &#123;
+                        <span class="keyword">yield</span> Poll::Pending;
+                    &#125;
+                &#125;
+            &#125;;
+        &#125;;
+        <span class="keyword">let</span> <span class="variable">gen_pin</span> = Pin::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(gen));
+        Task &#123;
+            generator: gen_pin,
+        &#125;
+    &#125;
+
+    <span class="keyword">fn</span> <span class="title function_">poll</span>(<span class="keyword">mut</span> <span class="keyword">self</span>: Pin&lt;&amp;<span class="keyword">mut</span> <span class="keyword">Self</span>&gt;, waker: Waker) <span class="punctuation">-&gt;</span> Poll&lt;()&gt; &#123;
+        <span class="keyword">return</span> <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">GeneratorState</span>::<span class="title function_ invoke__">Yielded</span>(_) = <span class="keyword">self</span>.generator.<span class="title function_ invoke__">as_mut</span>().<span class="title function_ invoke__">resume</span>(waker.<span class="title function_ invoke__">clone</span>()) &#123;
+            Poll::Pending
+        &#125; <span class="keyword">else</span> &#123;
+            Poll::<span class="title function_ invoke__">Ready</span>(())
+        &#125;
+    &#125;
+&#125;
+
+<span class="keyword">const</span> VTABLE: RawWakerVTable = <span class="keyword">unsafe</span> &#123;
+    RawWakerVTable::<span class="title function_ invoke__">new</span>(
+        |data| &#123;
+            RawWaker::<span class="title function_ invoke__">new</span>(data, &amp;VTABLE)
+        &#125;,
+        |data| &#123;
+        &#125;,
+        |data| &#123;
+        &#125;,
+        |data| &#123;
+        &#125;,
+    )
+&#125;;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">task</span> = Task::<span class="title function_ invoke__">new</span>(<span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]);
+    <span class="keyword">loop</span> &#123;
+        <span class="keyword">let</span> <span class="variable">task_pin</span> = Pin::<span class="title function_ invoke__">new</span>(&amp;<span class="keyword">mut</span> task);
+        <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Poll</span>::<span class="title function_ invoke__">Ready</span>(_) = task_pin.<span class="title function_ invoke__">poll</span>(<span class="keyword">unsafe</span> &#123;Waker::<span class="title function_ invoke__">from_raw</span>(RawWaker::<span class="title function_ invoke__">new</span>(std::ptr::<span class="title function_ invoke__">null</span>(), &amp;VTABLE))&#125;) &#123;
+            <span class="keyword">break</span>;
+        &#125;
+        std::thread::<span class="title function_ invoke__">sleep</span>(Duration::<span class="title function_ invoke__">from_millis</span>(<span class="number">200</span>));
+    &#125;
+&#125;</code></pre>
+
+
+
+<h3 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h3><p><a target="_blank" rel="noopener" href="https://os.phil-opp.com/async-await/">Writing an OS in Rust-Async&#x2F;Await</a></p>
+<p><a target="_blank" rel="noopener" href="https://doc.rust-lang.org/beta/unstable-book/language-features/generators.html">The Rust Unstable Book-generators</a></p>
+<p><a target="_blank" rel="noopener" href="https://cfsamson.github.io/books-futures-explained/">Futures Explained in 200 Lines of Rust</a></p>
+<p><a target="_blank" rel="noopener" href="https://boats.gitlab.io/blog/post/wakers-i/">The Waker API I: what does a waker do?</a></p>
+<p><a target="_blank" rel="noopener" href="https://tmandry.gitlab.io/blog/posts/optimizing-await-1/">How Rust optimizes async&#x2F;await I</a></p>
+<p><a target="_blank" rel="noopener" href="https://aturon.github.io/blog/2016/08/11/futures/">Zero-cost futures in Rust</a></p>
+
+  <p><a class="classtest-link" href="/tags/Rust/" rel="tag">Rust</a>, <a class="classtest-link" href="/tags/%E5%BC%82%E6%AD%A5%E7%BC%96%E7%A8%8B/" rel="tag">异步编程</a> — Jan 8, 2024</p>
+  
+
+
+        </div>
+        <div class="row mt-2">
+  <h3>Search</h3>
+  <div><input id="search-text" title="search" class="search-text" type="text" placeholder="search......"></div>
+  <div style="margin-top: 1.5rem;">
+    <ul id="result"></ul>
+  </div>
+</div>
+        <div class="row mt-2">
+  
+    <div class="eight columns">
+      <p id="madewith">Made with ❤ and
+        <a class="footer-link icon" href="https://hexo.io" target="_blank" style="text-decoration: none;" rel="noreferrer" aria-label="Hexo.io">
+        <svg class="hexo svg-hov" width="14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Hexo.js</title><path d="M12 .007L1.57 6.056V18.05L12 23.995l10.43-6.049V5.952L12 .007zm4.798 17.105l-.939.521-.939-.521V12.94H9.08v4.172l-.94.521-.938-.521V6.89l.939-.521.939.521v4.172h5.84V6.89l.94-.521.938.521v10.222z"/></svg>
+        </a>
+        
+        at <a href="https://en.wikipedia.org/wiki/Earth" target="_blank" rel="noreferrer">Earth</a>.</p>
+        
+    </div>
+
+    <!-- Sepcial thanks to https://simpleicons.org/ for the icons -->
+    <div class="four columns mb-3 posisi" >
+      
+      <a class="ml-0 footer-link icon" href="https://github.com/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="GitHub">
+        <svg class="github svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://linkedin.com/in/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="LinkedIn">
+        <svg class="linkedin svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>LinkedIn</title><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://twitter.com/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="Twitter">
+        <svg class="twitter svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Twitter</title><path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.896-.959-2.173-1.559-3.591-1.559-2.717 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://instagram.com/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="Instagram">
+        <svg class="instagram svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Instagram</title><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://stackoverflow.com/story/tobiasreithmeier" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="StackOverflow">
+        <svg class="stackoverflow svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Stack Overflow</title><path d="M15.725 0l-1.72 1.277 6.39 8.588 1.716-1.277L15.725 0zm-3.94 3.418l-1.369 1.644 8.225 6.85 1.369-1.644-8.225-6.85zm-3.15 4.465l-.905 1.94 9.702 4.517.904-1.94-9.701-4.517zm-1.85 4.86l-.44 2.093 10.473 2.201.44-2.092-10.473-2.203zM1.89 15.47V24h19.19v-8.53h-2.133v6.397H4.021v-6.396H1.89zm4.265 2.133v2.13h10.66v-2.13H6.154Z"/></svg>
+      </a>
+      
+
+    </div>
+  
+</div>
+
+      </div>
+
+    </div>
+
+  </div>
+  <script src="/js/nanobar.min.js"></script>
+
+  <script>
+    var options = {
+      classname: 'nanobar',
+      id: 'myNanobar'
+    };
+    var nanobar = new Nanobar(options);
+    nanobar.go(30);
+    nanobar.go(76);
+    nanobar.go(100);
+  </script>
+
+</body>
+
+</html>
