@@ -1,0 +1,1360 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+  <!-- Minima -->
+  <!-- Hexo theme created by @adisaktijrs -->
+
+  <!-- Basic Page Needs
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta charset="utf-8">
+
+  
+  <title>Rust笔记</title>
+  
+  <link rel="sitemap" href="http://example.comsitemap.xml,sitemap.txt" />
+  
+  <link rel="canonical" href="http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/">
+  
+  <meta name="description" content="基础写在最前面因为Rust比较难，所以一些概念我也是绕了很久，尤其是一些比较深入的概念，我则是查阅了很多资料最后给出一个合理的解释，所以文章有不少XXXX年-XX月-XX日追加这样的描述，如果追加内容和原文有冲突，请以追加为准，追加之间有冲突，请以最新的追加为准。当然了，一般而言都是没有冲突的，我也">
+  
+  
+  <meta name="author" content="John Doe">
+  
+  
+  
+  <meta property="og:site_name" content="Hexo" />
+  <meta property="og:type" content="article" />
+  <meta property="og:title" content="Rust笔记" />
+  
+  <meta property="og:description" content="基础写在最前面因为Rust比较难，所以一些概念我也是绕了很久，尤其是一些比较深入的概念，我则是查阅了很多资料最后给出一个合理的解释，所以文章有不少XXXX年-XX月-XX日追加这样的描述，如果追加内容和原文有冲突，请以追加为准，追加之间有冲突，请以最新的追加为准。当然了，一般而言都是没有冲突的，我也">
+  
+  <meta property="og:url" content="http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/" />
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Rust笔记">
+  
+  <meta name="twitter:description" content="基础写在最前面因为Rust比较难，所以一些概念我也是绕了很久，尤其是一些比较深入的概念，我则是查阅了很多资料最后给出一个合理的解释，所以文章有不少XXXX年-XX月-XX日追加这样的描述，如果追加内容和原文有冲突，请以追加为准，追加之间有冲突，请以最新的追加为准。当然了，一般而言都是没有冲突的，我也">
+  
+  
+  
+  
+  <meta name="twitter:url" content="http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/" />
+
+  <!-- Mobile Specific Metas
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Preload fonts
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="preload" href="/fonts/dm-serif-display-v4-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/inter-v2-latin-regular.woff2" as="font" type="font/woff2" crossorigin>
+
+  <!-- CSS
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  
+<link rel="stylesheet" href="/css/normalize.css">
+
+  
+<link rel="stylesheet" href="/css/skeleton.css">
+
+  
+<link rel="stylesheet" href="/css/custom.css">
+
+  
+<link rel="stylesheet" href="/css/prism-dark.css">
+
+  
+<link rel="stylesheet" href="/css/prism-line-numbers.css">
+
+  <!-- User css -->
+  
+  
+<link rel="stylesheet" href="/css/user.css">
+
+  
+
+  <!-- Favicon
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <link rel="icon" type="image/png" href="/images/favicon.png">
+
+  <!-- Custom Theme Color Style
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  <style>
+  a:not(.icon) {
+    text-decoration-color: #0FA0CE;
+    background-image: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 50%,
+      #0FA0CE 50%
+    );
+  }
+  blockquote {
+    border-left: 8px solid #0FA0CE;
+  }
+  .nanobar .bar {
+    background: #0FA0CE;
+  }
+  .button.button-primary:hover,
+  button.button-primary:hover,
+  input[type="submit"].button-primary:hover,
+  input[type="reset"].button-primary:hover,
+  input[type="button"].button-primary:hover,
+  .button.button-primary:focus,
+  button.button-primary:focus,
+  input[type="submit"].button-primary:focus,
+  input[type="reset"].button-primary:focus,
+  input[type="button"].button-primary:focus {
+    background-color: #0FA0CE;
+    border-color: #0FA0CE;
+  }
+  input[type="email"]:focus,
+  input[type="number"]:focus,
+  input[type="search"]:focus,
+  input[type="text"]:focus,
+  input[type="tel"]:focus,
+  input[type="url"]:focus,
+  input[type="password"]:focus,
+  textarea:focus,
+  select:focus {
+    border: 1px solid #0FA0CE;
+  }
+</style>
+
+  <!-- Google Analytics (With Privacy Settings On)
+  –––––––––––––––––––––––––––––––––––––––––––––––––– -->
+  
+
+  
+  <script src="/js/pic.min.js" defer></script>
+  
+
+  
+
+<meta name="generator" content="Hexo 7.0.0"></head>
+
+<body>
+  <div class="container">
+    <div class="row">
+      <div>
+
+        <div class="row">
+  <div class="two columns" style="max-width: 50px">
+    <h1 class="mt-2 mode">
+      <div onclick=setDarkMode(true) id="darkBtn">🌙</div>
+      <div onclick=setDarkMode(false) id="lightBtn" class=hidden>☀️</div>
+      <script >
+        if (localStorage.getItem('preferredTheme') == 'dark') {
+          setDarkMode(true)
+        }
+        function setDarkMode(isDark) {
+          var darkBtn = document.getElementById('darkBtn')
+          var lightBtn = document.getElementById('lightBtn')
+          if (isDark) {
+            lightBtn.style.display = "block"
+            darkBtn.style.display = "none"
+            localStorage.setItem('preferredTheme', 'dark');
+          } else {
+            lightBtn.style.display = "none"
+            darkBtn.style.display = "block"
+            localStorage.removeItem('preferredTheme');
+          }
+          document.body.classList.toggle("darkmode");
+        }
+      </script>
+    </h1>
+  </div>
+
+  <div class="six columns ml-1">
+    <h1 class="mt-2">
+      给代码来点Buff！
+    </h1>
+  </div>
+
+  <div class="twelve columns">
+    <div class="row">
+      <div class="nine columns left">
+        <a href="/">Home</a>
+        
+          
+          <a href="/Works" class="ml">Works</a>
+          
+        
+          
+          <a href="/About" class="ml">About</a>
+          
+        
+        
+          
+            <a href="mailto:codewithbuff@163.com" target="_blank" class="ml">Email</a>
+          
+        
+      </div>
+    </div>
+    <hr style="margin-bottom: 2.6rem">
+  </div>
+</div>
+
+        <div class="trans">
+            <h2>Rust笔记</h2>
+
+  <h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><h3 id="写在最前面"><a href="#写在最前面" class="headerlink" title="写在最前面"></a>写在最前面</h3><p>因为Rust比较难，所以一些概念我也是绕了很久，尤其是一些比较深入的概念，我则是查阅了很多资料最后给出一个合理的解释，所以文章有不少<code>XXXX年-XX月-XX日追加</code>这样的描述，如果追加内容和原文有冲突，请以追加为准，追加之间有冲突，请以最新的追加为准。当然了，一般而言都是没有冲突的，我也会定期做冲突处理。</p>
+<h3 id="绪论"><a href="#绪论" class="headerlink" title="绪论"></a>绪论</h3><p>在这里我们不讲什么变量定义，控制语句，关键词之类的基础，我们只讲那些，Rust独有的，比较有难点的东西。此外，本文只是一个阅读笔记，它没有很全面地去讲解，更多是我读完了之后的自我总结，所以建议读者先读读飞哥的<a target="_blank" rel="noopener" href="http://course.rs/">圣经</a>，然后可以参考我的理解去加强对于Rust的学习。</p>
+<h3 id="基本类型"><a href="#基本类型" class="headerlink" title="基本类型"></a>基本类型</h3><p>Rust的基本类型包括：</p>
+<ul>
+<li><p>i家族：i8 i16 i32 i64 i128</p>
+</li>
+<li><p>u家族：u8 u16 u32 u64 u128</p>
+</li>
+<li><p>f家族：f32 f64</p>
+</li>
+<li><p>bool</p>
+</li>
+<li><p>char，注意，Rust的Char是UTF-8编码的，即’🥹’算是一个字符。这也导致对于字符串的处理需要额外小心。</p>
+</li>
+</ul>
+<p>此外，Rust还有一些特殊类型，除去元组这个某些语言有，某些语言没有的东西，另外就是单元类型：<code>()</code>和发散类型：<code>!</code> 对没错，小括号和感叹号是两个类型。</p>
+<h4 id="独有类型"><a href="#独有类型" class="headerlink" title="独有类型"></a>独有类型</h4><p><strong>单元类型</strong>类似Go的空结构体，可以<strong>作为占位符</strong>使用，也可以<strong>作为C的void</strong>使用，单元类型的值就是()，是的，它类型和值都是小括号。而且它<strong>表示函数返回空</strong>，比如main()函数可以理解成main返回单元类型，即返回空。</p>
+<p>此外，在Rust中函数返回空是算返回值的，真正<strong>没有返回值的是发散类型</strong>，即返回值为!的函数，它<strong>表示函数永不返回</strong>，可以用于指出某一函数尚未实现。</p>
+<h3 id="所有权机制"><a href="#所有权机制" class="headerlink" title="所有权机制"></a>所有权机制</h3><p>首先，所有语言都无法回避的一个事实是资源回收问题，而这个问题的典型就是内存回收，所以编程语言分为了两大类：手动回收内存和GC回收。然而Rust选择了第三种方式：编译器回收，即所有权系统。</p>
+<ul>
+<li><p>所有权系统：解决内存释放问题和二次释放问题。</p>
+</li>
+<li><p>生命周期系统：解决悬垂引用问题。</p>
+</li>
+</ul>
+<p>Rust中的一个普通的赋值语句：let a &#x3D; XXX；a称为变量，即variable；而XXX称为内存对象，也叫做值，即value。每一个赋值操作称为值绑定，因为此时不仅仅对变量进行了赋值，我们还把值的所有权一并加到了变量上。</p>
+<ul>
+<li>Rust中一个值只有一个变量拥有它的所有权</li>
+</ul>
+<p>当<strong>拥有所有权的变量离开了自己的作用域</strong>时，与它<strong>绑定的值就被析构函数释放</strong>了，进而完成资源的释放。或者说，所有权保证了值的生存，值一旦失去所有权，就会被释放，而所有权是变量负责保存的。</p>
+<p>使用变量a给另一个变量b赋值，会发生所有权转移，此时新的变量b将对值负责，a也<strong>无法再次使用</strong>。</p>
+<ul>
+<li>所有权是一个编译器抽象的概念，它不存在于实际的代码中，它仅仅是一种思想。</li>
+</ul>
+<h3 id="所有权和Copy"><a href="#所有权和Copy" class="headerlink" title="所有权和Copy"></a>所有权和Copy</h3><p>不是每一次赋值操作都会导致所有权转移，对于T类型而言，使用变量a对变量b进行赋值，如果<strong>T实现了Copy</strong>，那么<strong>会发生一次副本操作</strong>，即，发生一次完整的内存复制，此时<strong>a和b各自绑定独立的值</strong>，互不干扰，只是它们的值内容相同。</p>
+<p>而<strong>没有实现Copy</strong>的类型，则<strong>会发生所有权转移</strong>，又称为“<strong>移动</strong>”，此时除了所有权转移，<strong>同样会发生值的复制</strong>，就和C语言的普通赋值一样，只是这一次所有权不会复制，a的值将被释放，因为它的值的所有权被移走了。还记得我们前面说的吗？失去了所有权的值将被释放。但是此时新的变量的值是旧变量的副本。</p>
+<p>这样来看，Copy仅仅保证所有权是否被Duplicate。</p>
+<h3 id="Copy和Clone"><a href="#Copy和Clone" class="headerlink" title="Copy和Clone"></a>Copy和Clone</h3><p>既然说到了Copy，顺嘴提一下Clone。Clone是Copy的父trait。实现了Copy的T类型必须实现Clone。</p>
+<ul>
+<li><p>Copy：强调位复制，且仅作用于存储在栈上和<strong>非Drop</strong>的类型。由编译器实现，无法自行实现。</p>
+</li>
+<li><p>Clone：强调副本有效性，会进行深拷贝，保证新的值完全有效。可由用户自行实现。</p>
+</li>
+</ul>
+<p>更加详细地见<a target="_blank" rel="noopener" href="https://rustcc.cn/article?id=c3fc25cf-dab6-4b51-8547-1ff4aacbfc32">这里</a></p>
+<p>Copy本质是一个编译器trait，用于标注一个类型是否可Copy。它无法被主动实现，想要某个T类型实现Copy，可通过派生宏进行派生，<strong>当且仅当所有字段均是Copy类型是，T才是Copy的</strong>。</p>
+<p>一般而言，基本类型都是Copy的，数组或元组的元素类型全部是Copy的，数组或元组才是Copy的。</p>
+<h4 id="2022-06-10追加"><a href="#2022-06-10追加" class="headerlink" title="2022-06-10追加"></a>2022-06-10追加</h4><p>首先来看一段代码：</p>
+<pre><code class="highlight rust"><span class="keyword">struct</span> <span class="title class_">MyType</span> &#123;
+    a: <span class="type">i64</span>,
+    b: <span class="type">Box</span>&lt;Inner&gt;,
+&#125;
+
+<span class="keyword">struct</span> <span class="title class_">Inner</span> &#123;
+    a: <span class="type">i32</span>,
+    b: <span class="type">i32</span>,
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">t</span> = MyType &#123;
+        a: <span class="number">1</span>,
+        b: <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(Inner &#123;
+            a: <span class="number">2</span>,
+            b: <span class="number">3</span>,
+        &#125;),
+    &#125;;
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;:p&#125;, &#123;:p&#125;, &#123;:p&#125;&quot;</span>, &amp;t.a, &amp;t.b.a, &amp;t.b.b);
+    <span class="keyword">let</span> <span class="variable">tt</span> = t;
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;:p&#125;, &#123;:p&#125;, &#123;:p&#125;&quot;</span>, &amp;tt.a, &amp;tt.b.a, &amp;tt.b.b); <span class="comment">// 后面两个地址没变</span>
+&#125;</code></pre>
+
+<p>这里的结果说明了，当发生<strong>所有权转移时</strong>，到底什么被复制了一份。我并没有查阅到细致的资料，于是猜测，<strong>只有栈上的数据，或者指向堆上数据的栈上指针会被复制</strong>，除非显式地clone，否则不会发生堆上数据复制。</p>
+<p>此外，为什么<code>Copy</code>一定要求<code>Clone</code>？不妨换一个角度来思考，那就是<strong>实现了<code>Copy</code>的类型在赋值时，会自动调用其clone方法得到一个副本</strong>，所以<code>T: Copy</code>时，T进行赋值会得到一个新的副本，而不是转移所有权。</p>
+<h3 id="不想要所有权？引用登场"><a href="#不想要所有权？引用登场" class="headerlink" title="不想要所有权？引用登场"></a>不想要所有权？引用登场</h3><p>有些时候我们仅仅想要使用对象，而不想获得所有权，比如一个打印函数，肯定只想读取变量，不然打印完还要把所有权返回出去可太麻烦了！此时我们引入<strong>引用</strong>这个概念。</p>
+<p>引用正如绝大多数语言中的指针。对于T类型，它的引用类型是&amp;T，是一个指向内存对象的指针，引用变量保存着内存对象的地址。</p>
+<ul>
+<li>引用类型不会获得所有权。</li>
+</ul>
+<p>引用分为可变引用和不可变引用。</p>
+<ul>
+<li>在同一作用域下，只能存在一个可变引用或多个不可变引用。</li>
+</ul>
+<p>此外，引用的作用域比变量小一些，变量直到离开作用域才被认为可以回收了，引用一旦不再使用便认为不会影响后续操作了。</p>
+<p>所有的引用类型都是Copy的，即使用引用赋值另一个引用不会转移这个引用的所有权，其实就是获得了两个指向同一对象的指针；注意，这里是引用的所有权，而不是引用引用的对象的所有权。Rust中所有的值都有所有权，引用类型的值也是值。</p>
+<p>如果我们即想获得所有权，还不想复制T类型，减少内存复制开销时，该怎么办呢？可以使用Box类型进行包装。</p>
+<h4 id="2022-05-30追加"><a href="#2022-05-30追加" class="headerlink" title="2022-05-30追加"></a>2022-05-30追加</h4><p>补充一些知识，如果你想通过解引用得到的内存对象去作为右值赋给一个新的变量，则会发生报错，因为解引用得到的东西类似一个影子变量，它没有所有权，所以无法通过它实现move语义，或者移动所有权&#x2F;释放等需要所有权的操作，这些操作仅限本体，影子是没有这样的权限的，不然所有权机制就没用了。</p>
+<p>但是假如类型T实现了Copy语义，那个通过影子变量，则会发生一次副本操作，看个例子就好：</p>
+<pre><code class="highlight rust"><span class="keyword">struct</span> <span class="title class_">MyType</span>&lt;T&gt; &#123;
+    val: T
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">num1</span> = <span class="number">1</span>;
+    <span class="keyword">let</span> <span class="variable">num1_ref</span> = &amp;num1;
+    <span class="comment">// 这是可以的，因为i32类型实现了Copy，可以针对实现了Copy的类型的T的影子变量进行副本操作，这不会干扰本体的所有权</span>
+    <span class="keyword">let</span> <span class="variable">num2</span> = *num1_ref;
+    <span class="keyword">let</span> <span class="variable">x</span> = MyType&#123;val: <span class="number">1</span>&#125;;
+    <span class="keyword">let</span> <span class="variable">y</span> = &amp;x;
+    <span class="comment">// 这里报错，因为无法通过解引用得到的影子变量移动所有权</span>
+    <span class="keyword">let</span> <span class="variable">z</span> = *y;
+&#125;</code></pre>
+
+<p>看到这里，可以总结一下：<strong>可以通过解引用得到的影子变量进行更新和读取(读写操作)，但是无法通过影子变量进行所有权操作</strong>，因为这涉及到谋权篡位，会影响本体对于内存对象的掌控。</p>
+<p>你虽然<strong>不能通过引用</strong>(其实是自动解引用之后的影子变量)去<strong>移动所有权</strong>，但是你可以神不知鬼不觉的替换，这是可能的，或者悄咪咪地进行更新，这样当你使用完成后，对于本体而言，对象该有的部分还有，只要不缺胳膊少腿就是OK的。比如下面的示例：</p>
+<pre><code class="highlight rust"><span class="keyword">struct</span> <span class="title class_">MyType</span>&lt;T&gt; &#123;
+    val: T
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">x</span> = MyType&#123;val: <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;aaa&quot;</span>)&#125;;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">y</span> = &amp;<span class="keyword">mut</span> x;
+    y.val = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;bbb&quot;</span>)
+&#125;</code></pre>
+
+<h4 id="2022-08-08追加"><a href="#2022-08-08追加" class="headerlink" title="2022-08-08追加"></a>2022-08-08追加</h4><p>关于为什么通过解可变引用可以更换变量保存的值的理解。试想一下，在C&#x2F;C++中，我们可以通过解引用一个指针，然后去更新甚至替换变量保存的值，因为解引用操作等于得到了指针指向的变量。</p>
+<p>那么同样的语义Rust从C++搬来了，而我们知道Rust只允许在同一作用域下存在一个可变引用，所以<strong>在通过可变引用解引用并操作变量的这个范围内，是不会影响到任何依赖这个变量的其他操作的</strong>。</p>
+<p>假如在第一个作用域操作A读取了变量为a，第二个作用域通过可变引用更新了变量，第三个作用域操作B读取变量为b；于操作A和B而言，它们只是知道变量更新了自己，但是不知道是通过可变引用更新的！所以对于那些不可变引用的操作，就是变量自己的行为，感知不到可变引用的行为，所以符合编程语义，示例：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">a</span> = <span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    &#123;
+        <span class="keyword">let</span> <span class="variable">v</span> = a[<span class="number">1</span>];
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, v);
+    &#125;
+    &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">a_ref</span> = &amp;<span class="keyword">mut</span> a;
+        (*a_ref) = <span class="built_in">vec!</span>[<span class="number">2</span>, <span class="number">3</span>, <span class="number">4</span>];
+    &#125;
+    <span class="comment">// 上面等价于下面</span>
+    <span class="comment">// a = vec![2, 3, 4];</span>
+    &#123;
+        <span class="keyword">let</span> <span class="variable">v</span> = a[<span class="number">1</span>];
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, v);
+    &#125;
+&#125;</code></pre>
+
+<p>此外，作为赋值右侧表达式则会令字段失去所有权，部分所有权是允许的，但是不建议。一句话，<strong>影子变量可以实现除转移所有权外的所有变量能实现的操作</strong>：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">a</span> = <span class="number">1</span>;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">b</span> = &amp;<span class="keyword">mut</span> a;
+    *b = <span class="number">2</span>;
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, a);
+&#125;</code></pre>
+
+<h4 id="2022-08-12追加"><a href="#2022-08-12追加" class="headerlink" title="2022-08-12追加"></a>2022-08-12追加</h4><p><strong>Rust在处理所有权时，是面相变量的，而不是面相内存的</strong>。什么意思呢？你可以针对某一个变量，重新赋值，甚至通过在前面添加let语句改变变量类型再重新赋值，而原本变量指向的内存区域已经被释放。</p>
+<p>所以准确来说Rust保证变量在被使用时一定的合法的，而某一个内存区域则不然，因为没有变量引用的内存区域(即没有所有权的内存区域)是需要回收的。</p>
+<p>这也就可以解释为什么可以通过解引用可变引用进行重新赋值和内部更新，因为这依旧满足了变量的合法性，而不是内存的合法性。</p>
+<p>来一个引用，解引用和值，变量，类型，对象的概念：</p>
+<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/type_variable_value_ref_deref_object.svg"></p>
+<p>来看文字描述：</p>
+<ul>
+<li>值：一组bit组成的集合</li>
+<li>对象：内存上的一组值的集合，或者包含值的值</li>
+<li>类型：解释内存上一组值的方式，同时还包含了可以作用于这组值的行为</li>
+<li>变量：对象的具名代表，或者说有名字的对象</li>
+<li>引用：保存了对象起始地址的受限变量</li>
+<li>解引用：访问引用保存的地址得到的对象，但是不拥有所有权</li>
+<li>裸指针：保存对象起始地址的完全访问变量</li>
+</ul>
+<p>在这里再提一下解引用，上面说它是影子变量，其实如果学过C++的话，可以理解成变量的引用，但是没有所有权，在C++中，引用有种类似变量别名的意思，完全可以代指变量，在Rust里，理解成一个没有所有权的变量的别名，除了无法转移所有权之外，变量能做的它都能(写法上来看，就是无法出现在<code>=</code>右边)</p>
+<h4 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h4><p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/374392832">什么是move？理解C++ Value categories，move， move in Rust</a></p>
+<h4 id="引用和指针"><a href="#引用和指针" class="headerlink" title="引用和指针"></a>引用和指针</h4><p>这里提一下引用和指针。引用有两种类型：<code>&amp;T</code>和<code>&amp;mut T</code>，指针亦是如此：<code>*const T</code>和<code>* T</code>，分别都是可变和不可变。他们的值都是被引用&#x2F;被指向对象的地址，但是不同在于：</p>
+<ul>
+<li>定义方式不同：一个&amp;一个*</li>
+<li>编译器处理不同：引用会涉及生命周期检查和可变性&#x2F;多个不可变性检查；而指针则不存在这些，甚至无法保证指向的数据不会被更改或者删除，所以放在了unsafe中进行详细讲述</li>
+</ul>
+<p>同样，对二者的使用都涉及到解引用操作，因为保存的都是地址。通俗一点来说，<strong>引用是被编译器加了限制的指针</strong>。</p>
+<h3 id="DST和Fat-Pointer"><a href="#DST和Fat-Pointer" class="headerlink" title="DST和Fat Pointer"></a>DST和Fat Pointer</h3><p>提到了引用类型，我们不得不提一下切片引用和宽指针这个概念。</p>
+<p>在Rust中，有一些类型，它们的大小编译期无法确定，但是我们又不想，或者不能把它们留到运行期处理，这些类型称为动态类型，即DSTs。</p>
+<p>你可能会疑惑？类型大小不是确定的吗？怎么会不清楚呢？以数组为例，Rust的数组类型，定义为：[T;size]，其类型由T和大小size组成。</p>
+<p>而切片类型：[T]则没有size，所以它的大小是不确定的，我们不知道一个切片到底引用了多长的数组不是吗？</p>
+<p>类似的还有trait，我们也不知道实现了这个trait的类型到底是什么样的，而可能有多个不同的类型都实现了这个trait，每个类型都有自己的大小，所以它的大小也是不确定的。</p>
+<p><strong>对于DST类型，我们使用它们的指针类型来进行处理</strong>。但是这里的指针类型，不是简单的包含地址，它还包含了附加信息，比如切片指针，还包含了切片长度，所以此时这个指针的大小是8+8&#x3D;16字节；因为它比一般的指针大，所以我们称之为“宽指针”。</p>
+<p>因为DST的宽指针更好用，所以实际使用时，都是使用它们的指针形式，比如&amp;[T]。</p>
+<p>最后放一个链接，关于DSTs的<a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/57754901/what-is-a-fat-pointer">讨论</a></p>
+<h4 id="str-String"><a href="#str-String" class="headerlink" title="&amp;str&#x2F;String"></a>&amp;str&#x2F;String</h4><p>这里既然提到了&amp;[T]，就不得不说&amp;[u8]和&amp;str以及str和String。**&amp;str就是&amp;[u8]<strong>，</strong>str是String的底层切片<strong>，即</strong>保存字面量的那个数组的切片**，但是刚刚说过一般不用切片，而是用切片的引用，所以一般用&amp;str。</p>
+<p>后面为了简单称呼，一般<strong>对切片的引用称为切片</strong>，因为没什么人会真的用切片，大家都用切片引用。</p>
+<ul>
+<li><p>String用于存储需要动态更改的数据，或者需要所有权的数组。</p>
+</li>
+<li><p>&amp;str不存在所有权，一般适用于字面量或不会更改的字符串；字面量会被编译进可执行文件中，&amp;str便是把这个可执行文件当成一个大号的字节数组，然后对其的引用。</p>
+</li>
+</ul>
+<h3 id="结构体和枚举"><a href="#结构体和枚举" class="headerlink" title="结构体和枚举"></a>结构体和枚举</h3><p>Rust的结构体和C以及Go的类似，这里需要注意的是，如果想更改Rust的结构体，需要设置结构体变量为mut，而不能指定某一字段单独为mut。</p>
+<p>如果结构体的字段是可以拥有所有权的字段的话，对这样的字段赋值或者构造这样的结构体，会涉及所有权转移问题。</p>
+<p>let a &#x3D; b操作用于结构体类型时，不仅仅会转移结构体的所有权，还会转移字段的所有权(如果字段不是Copy的话)。</p>
+<h4 id="2022-09-14追加"><a href="#2022-09-14追加" class="headerlink" title="2022-09-14追加"></a>2022-09-14追加</h4><p>枚举大小怎么算？Rust的枚举并不是简单的取最大枚举值大小，这点和联合类型不同，相比较之下，Rust的枚举实现是tagged union。</p>
+<p>tagged union的定义是：<strong>一个包含多种不同类型，但是类型总数有限的集合</strong>。既然是不同类型，那么类型大小肯定也可以不同，所以为了在编译时区分，引入了一个tag标签，指出当前使用的到底是哪个具体的子类型。</p>
+<p>而在Rust中，这个tag是usize的，在x64位上就是8字节。顺便一提，这也是Rust不支持枚举内嵌枚举的原因，因为会导致类型大小无法计算。想象一下，一个8字节的枚举值内嵌自己，那就是8+8+8…..无限。</p>
+<p>但是如果只有一个枚举值，则不需要tag进行记录，所以大小就是枚举值的大小。</p>
+<pre><code class="highlight rust"><span class="keyword">enum</span> <span class="title class_">Book</span> &#123;
+    <span class="title function_ invoke__">Cpp</span>(<span class="type">String</span>),
+    <span class="title function_ invoke__">Java</span>(<span class="type">f64</span>),
+    Golang&#123;
+        name: <span class="type">String</span>,
+        price: <span class="type">f64</span>,
+    &#125;,
+    <span class="title function_ invoke__">Rust</span>(<span class="type">u64</span>),
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">golang_size</span> = std::mem::size_of::&lt;<span class="type">String</span>&gt;() + std::mem::size_of::&lt;<span class="type">f64</span>&gt;();
+    <span class="built_in">println!</span>(<span class="string">&quot;tag size: &#123;&#125; bytes.&quot;</span>, std::mem::size_of::&lt;Book&gt;() - golang_size);
+&#125;
+
+<span class="comment">// tag size: 8 bytes.</span></code></pre>
+
+<p>但是也不是所有多枚举值都有tag的，有些枚举，比如全部都没有值的枚举，则不需要tag，因为大小都是一样的，都是0，仅仅需要适当的数字来表示。</p>
+<p>此外对于Option这种，None可以使用全0表示的，对于Option&lt;NotNull&lt;i64&gt;&gt;这种，就可以通过全0和非全0区分，自然也不需要tag。</p>
+<p>然后就是直接可以用枚举值做tag的，则大小依赖于枚举值：</p>
+<pre><code class="highlight rust"><span class="comment">// size 1 bytes</span>
+<span class="keyword">enum</span> <span class="title class_">E</span> &#123;
+    A = <span class="number">32</span>,
+    B = <span class="number">64</span>,
+    C = <span class="number">128</span>,
+&#125;
+
+<span class="comment">// size 2 bytes</span>
+<span class="keyword">enum</span> <span class="title class_">E</span> &#123;
+    A = <span class="number">32</span>,
+    B = <span class="number">64</span>,
+    C = <span class="number">128</span>,
+    D = <span class="number">256</span>,
+&#125;
+
+<span class="comment">// size 4 bytes</span>
+<span class="keyword">enum</span> <span class="title class_">E</span> &#123;
+    A = <span class="number">32</span>,
+    B = <span class="number">64</span>,
+    C = <span class="number">128</span>,
+    D = <span class="number">256</span>,
+    E = <span class="type">i32</span>::MAX <span class="keyword">as</span> <span class="type">isize</span>,
+&#125;
+
+<span class="comment">// size 8 bytes</span>
+<span class="keyword">type</span> <span class="title class_">E</span> = <span class="type">Option</span>&lt;NonNull&lt;<span class="type">i64</span>&gt;&gt;;</code></pre>
+
+
+
+<h3 id="枚举-match"><a href="#枚举-match" class="headerlink" title="枚举+match"></a>枚举+match</h3><p>Rust的枚举类型很强大，有一点就是，它的枚举实例的值，可以是不同类型的；这一点在Result和Option被展现的淋漓尽致。枚举通常和match搭配使用，很重要的一点就是match可以获取到枚举实例中保存的值。</p>
+<p>match语句必须包含 _ 情况，即“default”情况作为全部失配的候选。</p>
+<h4 id="2022-07-03追加"><a href="#2022-07-03追加" class="headerlink" title="2022-07-03追加"></a>2022-07-03追加</h4><p>这里说一下枚举类型在作为参数传递或者赋值时的所有权转移注意点。同结构体，如果是所有权转移，则涉及到复制。不过不要那么担心复制，因为很多时候栈上内存复制是很快的，此外也有寄存器做优化，只要不是很大的数据就行，否则考虑使用Box；在这里把枚举实例当成一个只包含一个字段的结构体实例来看就行。</p>
+<p>此外，寄存器优化不是永远存在的，如果涉及到对于变量的地址操作，则变量一定保存在内存中，毕竟寄存器不存在地址这一说。</p>
+<h4 id="if-let"><a href="#if-let" class="headerlink" title="if let"></a>if let</h4><p>此外还有if let语句，它用来匹配某一确定值的枚举实例而忽略其他所有可能，所以何时用if let，何时用match，取决于是否需要匹配某一确定的枚举实例值(注意不是枚举值，是枚举实例内部的值)。</p>
+<h4 id="模式匹配"><a href="#模式匹配" class="headerlink" title="模式匹配"></a>模式匹配</h4><p>Rust的模式匹配相当常见，赋值语句，元组赋值，for循环，match匹配，结构体和元组的解构，if let等，都是模式匹配，<strong>模式匹配要求右侧表达式符合左侧变量语法，即右侧值序列同左侧变量序列的类型，顺序，数量一致</strong>。</p>
+<h3 id="方法"><a href="#方法" class="headerlink" title="方法"></a>方法</h3><p>Rust的方法同大多数面向对象的语言的方法，如果<strong>方法第一个参数是self&#x2F;&amp;self&#x2F;&amp;mut self；则这是一个实例方法，否则是一个静态方法</strong>。但是实例方法我们一般都用&amp;self&#x2F;&amp;mut self，即当前对象的引用，如果是self则表示要获得这个对象的所有权，此时可能是基于当前对象构建新的对象。</p>
+<h3 id="泛型"><a href="#泛型" class="headerlink" title="泛型"></a>泛型</h3><p>Rust的泛型如同C++的模版，都是单态化编译，即针对每一个类型生成一个泛型方法。此外，Rust针对数组这样编译期确定大小的类型添加了值泛型，既然泛型会在编译后单态化，而数组大小也是一个编译常量，那为何不把数组大小作为泛型参数使用呢？这样编译后就得到了一个大小对应一个函数的结果，然后每个函数再对数组进行独立地实例化即可。</p>
+<p>这里需要说明一下，泛型的范围比预料中要广一些，举个例子：&amp;T作为泛型时，T不仅仅可以是i32，也可以是&amp;i32，此时&amp;T &#x3D;&#x3D; &amp;&amp;i32，是的，这是合理的。所以泛型T不仅仅可以是i32, i64, f64, bool等，也可以是它们的引用，可变引用，引用引用等。</p>
+<h3 id="trait"><a href="#trait" class="headerlink" title="trait"></a>trait</h3><p>Rust的trait类似其他语言的接口，它是一组行为的集合，除了简单的作为接口使用，它还可以作为函数参数和返回值使用。</p>
+<p>Rust的trait有一套称为“孤儿原则”的规则，即<strong>实现了trait的类型或者trait，至少有一个是在当前作用域定义</strong>的，否则可能发生某一类型被加上了其他的不相关的trait的情况。</p>
+<p>Rust的trait作为函数参数时，除了直接写在参数列表中，还可以使用特征约束(trait bound)的语法，指出传参类型必须实现了哪些trait。同时可以通过 ‘+’ 指出多个约束；也可以使用Where语句进行更加清晰地描述。</p>
+<p>除了作为函数参数，trait还可以作为函数返回值，但是，此时只能返回一种类型，即使返回的多个类型都实现了这个trait，编译器也会报错。</p>
+<h3 id="特征对象"><a href="#特征对象" class="headerlink" title="特征对象"></a>特征对象</h3><p>前面说函数无法返回不同的实现了同一特征的类型，因为返回的多个类型其实际大小不一致，无法转换到同一个特征变量上去，所以我们会使用特征对象引用来替代。这里需要指出，特征对象和特征对象引用的关系和切片以及切片引用的关系一样，特征对象由实际类型，静态类型，类型大小组成，而实际类型及其大小是编译期不可知的，所以无法直接使用，一般使用其引用类型。</p>
+<p>特征对象引用的类型是特征的引用，即&amp;trait类型。特征对象引用就是典型的<strong>宽指针</strong>。既然返回值的大小可能不一样，那我保存指针不就得了，指针大小可是一样的啊！特征对象引用就由两个指针构成，分别是<strong>数据指针和虚方法表指针</strong>。学过Go可以把它类比为interface{}类型。</p>
+<p>特征对象引用的类型是&amp;dyn trait，但是在实际传参时仅需使用&amp;val取地址即可，而不用指出dyn，这里的dyn仅在声明时表示这是一个特征对象引用类型。</p>
+<p>特征对象引用的虚方法表仅包含特征定义的方法，而不包含实际类型的其他方法。</p>
+<p>最后，同上，因为一般使用引用类型，所以特征对象的引用一般称为特征对象，如无特别说明，它们指的都是引用类型。</p>
+<h4 id="self和Self"><a href="#self和Self" class="headerlink" title="self和Self"></a>self和Self</h4><p>self用来指代当前对象，Self用来指代当前类型名称，这会导致编译时进行名称替换，把Self替换成具体的类型名称。</p>
+<p>为什么会突然提到这个呢？因为特征对象有两个限制：</p>
+<ul>
+<li>方法返回值不能是Self</li>
+<li>方法参数不能含有泛型</li>
+</ul>
+<p>关于第一个限制，很好理解，因为具体类型不需要被记录，特征对象仅包含两个指针即可，所以Self无法在编译时被翻译(解析特征对象是运行时的事)；第二个限制也是类似的，泛型是具体类型的类型参数，而不是特征的参数，具体类型都被抹掉了，那么作为具体类型参数的泛型参数肯定也无法被记录。</p>
+<h4 id="关联类型"><a href="#关联类型" class="headerlink" title="关联类型"></a>关联类型</h4><p>关联类型，字面意思，就是关联到一个类型上的参数，比如我们可以给类型T关联一个类型M，然后T的方法可能会用到M类型。比如如下代码：</p>
+<pre><code class="highlight rust"><span class="keyword">trait</span> <span class="title class_">Converter</span> &#123;
+    <span class="comment">// 这里设置绑定的类型</span>
+    <span class="keyword">type</span> <span class="title class_">Output</span>;
+
+    <span class="comment">// 这里指出返回值类型为与当前类型绑定的类型(在实现类中就是与实现类绑定的类型)</span>
+    <span class="keyword">fn</span> <span class="title function_">work</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span>::Output;
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Converter</span> <span class="keyword">for</span> <span class="title class_">i32</span> &#123;
+    <span class="comment">// 这里指出绑定的类型是什么</span>
+    <span class="keyword">type</span> <span class="title class_">Output</span> = <span class="type">i64</span>;
+
+    <span class="keyword">fn</span> <span class="title function_">work</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span>::Output &#123;
+        *<span class="keyword">self</span> <span class="keyword">as</span> <span class="type">i64</span>
+    &#125;
+&#125;
+
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">trait_learn</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">a</span>: <span class="type">i32</span> = <span class="number">12</span>;
+    <span class="keyword">let</span> <span class="variable">b</span> = a.<span class="title function_ invoke__">work</span>();
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, b)
+&#125;</code></pre>
+
+<p>关联类型和泛型的区别在于，可读性。是的，关联类型可读性高一些。</p>
+<p>此外，对于泛型类型，可以指定一个默认类型，比如在重载运算符时，可以把默认类型设为当前类型，这样在实现时，就不需要显示指明泛型类型：</p>
+<pre><code class="highlight rust"><span class="keyword">trait</span> <span class="title class_">Plus</span>&lt;T=<span class="keyword">Self</span>&gt; &#123;
+    <span class="keyword">fn</span> <span class="title function_">plus</span>(&amp;<span class="keyword">self</span>, v: &amp;T) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span>;
+&#125;
+
+<span class="comment">// 这里省略了&lt;T=i32&gt;</span>
+<span class="keyword">impl</span> <span class="title class_">Plus</span> <span class="keyword">for</span> <span class="title class_">i32</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">plus</span>(&amp;<span class="keyword">self</span>, v: &amp;<span class="keyword">Self</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;
+        *<span class="keyword">self</span> + *v
+    &#125;
+&#125;
+
+<span class="comment">// 这里则显示指出了参数的类型</span>
+<span class="keyword">impl</span> <span class="title class_">Plus</span>&lt;<span class="type">f64</span>&gt; <span class="keyword">for</span> <span class="title class_">i64</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">plus</span>(&amp;<span class="keyword">self</span>, v: &amp;<span class="type">f64</span>) <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;
+        *<span class="keyword">self</span> + (*v) <span class="keyword">as</span> <span class="type">i64</span>
+    &#125;
+&#125;
+
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">default_generics</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">a</span>: <span class="type">i32</span> = <span class="number">1</span>;
+    <span class="keyword">let</span> <span class="variable">b</span>: <span class="type">i32</span> = a.<span class="title function_ invoke__">plus</span>(&amp;<span class="number">2</span>);
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, b);
+    <span class="keyword">let</span> <span class="variable">c</span>: <span class="type">i64</span> = <span class="number">3</span>;
+    <span class="keyword">let</span> <span class="variable">d</span>: <span class="type">i64</span> = c.<span class="title function_ invoke__">plus</span>(&amp;<span class="number">4_f64</span>);
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, d)
+&#125;</code></pre>
+
+<p>对于同名方法的调用，遵循实例方法优先原则，如果想通过实例对象指定某一trait的方法，则需要使用限定方式。</p>
+<p>此外，对于多个trait的同名类方法，需要使用完全限定语法。</p>
+<p>对于特征的限制，也可以使用类似别的语言的父接口那样，限制当前trait的实现原则，比如指出当前trait必须先实现哪个trait，才能实现当前trait。</p>
+<h3 id="类型转换"><a href="#类型转换" class="headerlink" title="类型转换"></a>类型转换</h3><p>对于普通的类型转换，使用<code>as</code>关键字进行处理即可，如果想要处理溢出问题，可以使用<code>TryInfo</code>trait进行处理。此外，为了简化编写，Rust允许直接进行类型转换。</p>
+<h3 id="Error-or-panic"><a href="#Error-or-panic" class="headerlink" title="Error or panic?"></a>Error or panic?</h3><p>panic!()宏用于处理不可恢复的错误，它会导致当前线程终止，而如果当前线程是main线程的话，则会导致程序退出。</p>
+<p>对于想要手动处理的错误，可以使用Result枚举来完成，它包含两个枚举值：OK和Err。对于一个函数的返回值，我们当然可以通过match进行匹配：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">match</span> <span class="title function_ invoke__">error_result</span>(<span class="literal">false</span>) &#123;
+        <span class="title function_ invoke__">Ok</span>(<span class="type">str</span>) =&gt; &#123;
+            <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, <span class="type">str</span>)
+        &#125;
+        <span class="title function_ invoke__">Err</span>(err) =&gt; &#123;
+            <span class="built_in">println!</span>(<span class="string">&quot;err: &#123;&#125;&quot;</span>, err)
+        &#125;
+    &#125;
+&#125;
+
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">error_result</span>(flag: <span class="type">bool</span>) <span class="punctuation">-&gt;</span> <span class="type">Result</span>&lt;<span class="type">String</span>, <span class="type">String</span>&gt; &#123;
+    <span class="keyword">if</span> flag &#123;
+        <span class="title function_ invoke__">Ok</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;success&quot;</span>))
+    &#125; <span class="keyword">else</span> &#123;
+        <span class="title function_ invoke__">Err</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;failed&quot;</span>))
+    &#125;
+&#125;</code></pre>
+
+<p>此外，也可以进行错误链抛出，即当前方法遇到Err时，抛出到主调方，这就要求当前方法可以分别处理Ok和Err两种情况：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">f</span>() <span class="punctuation">-&gt;</span> <span class="type">Result</span>&lt;<span class="type">String</span>, <span class="type">String</span>&gt; &#123;
+    <span class="keyword">match</span> <span class="title function_ invoke__">error_result</span>(<span class="literal">false</span>) &#123;
+        <span class="title function_ invoke__">Ok</span>(<span class="type">str</span>) =&gt; &#123;
+            <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, <span class="type">str</span>);
+            <span class="title function_ invoke__">Ok</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;1&quot;</span>))
+        &#125;
+        <span class="title function_ invoke__">Err</span>(err) =&gt; &#123;
+            <span class="built_in">println!</span>(<span class="string">&quot;err: &#123;&#125;&quot;</span>, err);
+            <span class="title function_ invoke__">Err</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;2&quot;</span>))
+        &#125;
+    &#125;
+&#125;
+
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">error_result</span>(flag: <span class="type">bool</span>) <span class="punctuation">-&gt;</span> <span class="type">Result</span>&lt;<span class="type">String</span>, <span class="type">String</span>&gt; &#123;
+    <span class="keyword">if</span> flag &#123;
+        <span class="title function_ invoke__">Ok</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;success&quot;</span>))
+    &#125; <span class="keyword">else</span> &#123;
+        <span class="title function_ invoke__">Err</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;failed&quot;</span>))
+    &#125;
+&#125;</code></pre>
+
+<p>这样写起来未免有些啰嗦，甚至步入了Go的后尘，所以这里有一个编译器宏：<code>?</code>来简化处理，它会在返回结果为Err时，直接返回Err到主调方，而在返回Ok时，提取结果作为函数返回值使用：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">f</span>() <span class="punctuation">-&gt;</span> <span class="type">Result</span>&lt;<span class="type">String</span>, <span class="type">String</span>&gt; &#123;
+    <span class="keyword">let</span> <span class="variable">v</span> = <span class="title function_ invoke__">error_result</span>(<span class="literal">true</span>)?;
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, v);
+    <span class="title function_ invoke__">Ok</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;1&quot;</span>))
+&#125;
+
+<span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">error_result</span>(flag: <span class="type">bool</span>) <span class="punctuation">-&gt;</span> <span class="type">Result</span>&lt;<span class="type">String</span>, <span class="type">String</span>&gt; &#123;
+    <span class="keyword">if</span> flag &#123;
+        <span class="title function_ invoke__">Ok</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;success&quot;</span>))
+    &#125; <span class="keyword">else</span> &#123;
+        <span class="title function_ invoke__">Err</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;failed&quot;</span>))
+    &#125;
+&#125;</code></pre>
+
+<p>此外，这种方式亦可用于Option，在Option返回None时，返回当前函数，否则提取Some的值。</p>
+<h3 id="项目组织"><a href="#项目组织" class="headerlink" title="项目组织"></a>项目组织</h3><p>Rust的项目组件，从小到大可分为：</p>
+<ul>
+<li>模块：组织和限定Rust基本组件，比如组织同类的方法，结构体等。</li>
+<li>包(crate)：组织模块的单元，一个项目可以包含一个lib和多个bin包，它们在crago.toml文件中定义。</li>
+<li>工作空间：组织多个包的单元。</li>
+<li>项目(package)：组织整个项目的存在。</li>
+</ul>
+<p>这里需要留意，在别的语言中package是包的意思，在Rust中，是软件包的意思，即项目包，也即项目，而create才是包。下面如无特别说明，包都是crate，而不是package。</p>
+<p>package有两种：</p>
+<ul>
+<li>二进制(bin)：可直接运行，作为一个独立的App存在。</li>
+<li>库(lib)：作为第三方库被其他项目引用，无法独立运行。</li>
+</ul>
+<p>模块常用来组织行为。同时可以进行界限划分，同名的行为允许存在在不同的模块中，这是不冲突的。这里可以把模块和Go的包类比，二者都定义了一些方法，结构体，都进行了空间划分，都可以设定成员可见性。</p>
+<p>这里需要指明一下，对于结构体，在模块中指定结构体为pub不能把成员也编程pub的，必须手动指定成员。但是对于枚举，如果枚举是pub的，则枚举及其内部成员都是pub的。</p>
+<p>模块一般定义在src&#x2F;lib.rs(库包)或src&#x2F;bin.rs(二进制包)中，但是也可以创建别的文件，然后引用即可，默认引用的模块名为文件名。</p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>注释。Rust的注释和其他语言一样，分为行注释和块注释，此外，它的注释支持markdown格式，也可以像Java那样生成doc的网页形式。</p>
+<p>关于格式化输出，Rust没有%d, %s, %f这些，而是统一使用<code>&#123;&#125;</code>并让编译器区分参数类型。这里说一些常用的：</p>
+<ul>
+<li>{}：调用被输出对象的Display trait输出</li>
+<li>{:?}：调用Debug输出</li>
+<li>{:p}：输出地址</li>
+<li>{:05}：限制长度为5并使用前导0填补</li>
+</ul>
+<h2 id="高阶"><a href="#高阶" class="headerlink" title="高阶"></a>高阶</h2><h3 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h3><p>号称Rust最难的部分终于到来了！但其实也没那么难，只是比较新的概念罢了。</p>
+<p><strong>生命周期是一个帮助编译期分析引用依赖关系以判断引用存活范围是否会引起不正当行为的手段</strong>。编译期：呵！男人，不过是取悦我的手段罢了！生命周期标注不会扩大或缩小引用的生命周期，它<strong>仅仅是给编译期的提示</strong>。</p>
+<p>通俗一点来说，如果有一个函数返回了一个引用，那么这个引用的存活时间该怎么判断呢？首先需要知道，返回的引用必然是参数处理过来的，不可能是函数体创建的，在函数栈被回收之后这个引用必然失效，编译期不会允许的(使用Box强制分配怼另说)。所以我们需要通过参数的存活区间来限定返回值的存活区间。</p>
+<p>一个函数有多个参数，返回的引用的生命周期，到底该和谁看齐呢？<strong>假设返回值依赖N个参数中的M个参数的生命周期，则返回值的生命周期就是最小的那个</strong>。</p>
+<p>生命周期不仅仅存在于函数中，还存在于结构体中，如果字段包含引用，则<strong>结构体实例的生命周期必然小于字段的生命周期</strong>。</p>
+<p>为了简化开发，Rust存在一些函数中可以推断出生命周期的场景，进而无需标注即可使用，这些场景是否可行依赖三个原则：</p>
+<ul>
+<li>每一个参数都有自己的生命周期。</li>
+<li>如果只有一个参数是引用，则返回值生命周期等于参数的生命周期。</li>
+<li>如果存在&amp;self&#x2F;&amp;mut self，则返回值生命周期等于&amp;self&#x2F;&amp;mut self。</li>
+</ul>
+<p>通过上述三个规则去框到某一函数，就能知道这个函数到底可不可以省略生命周期语法。同时我们注意到，方法的生命周期默认等于实例引用的生命周期。当然，如果方法还有别的生命周期，并且你希望返回值依赖它，也可以手动标注出来。上述三个规则只是你懒的不想写时，编译期默认执行的手段而已，不是强制执行的。</p>
+<p>生命周期可能造成一些意想不到的编译错误，这些编译错误可能不是你造成的，而是因为编译期能力有限造成的。这里提一些：</p>
+<ul>
+<li>规则三可能会把self的生命周期拉长，变得和返回值一样，这可能出现意想不到的编译失败，比如扩大一个可变引用到不可变引用的区间，然后因为不可变引用和可变引用的排斥性出现编译失败。</li>
+<li>unsafe代码返回一个指针的指向对象的引用会产生无界生命周期，最好通过函数参数传递一个生命周期，然后把返回值的生命周期绑定到这个参数的生命周期上，完成有界限定。</li>
+<li>生命周期约束和特征约束类似。’a: ‘b表示a的生命周期大于b的，类似的，在结构体实现约束T: ‘a，其中a是结构体字段的生命周期，T是字段参数类型，则要求字段引用的数据的存活时间必须大于这个字段。</li>
+<li>闭包可能涉及更复杂的生命周期分析，不能套函数那一套。</li>
+<li>再借用允许针对一个引用再次获取它的引用，而无关两个引用类型是否冲突，但是要求第二次借用的引用不能在生命周期内使用第一次引用。</li>
+<li>实现方法时，如果没有用到生命周期，可以使用下划线<code>_</code>进行替代，增加美观度。</li>
+</ul>
+<p>这里需要声明一件事，就是生命周期只是用来跟踪被引用数据存活范围的，而不是引用的存活范围，引用本身没有存活范围这一说，我们讨论的都是背后的变量的存活。</p>
+<p>在Rust中，有一种特殊的引用，它们的生命周期是’static的，即全局，这种引用所指向的数据会存活直到程序结束。其实也就只有字符串字面量和常量这两个而已。</p>
+<p>现在，我们来看看’static相关的知识，个人觉得比较绕。</p>
+<p>和static相关的有两个，一个是生命周期：<code>&amp;&#39;static T</code>，一个是类型约束：<code>T: &#39;static</code>。现在来细说这俩的区别：</p>
+<ul>
+<li><code>&amp;&#39;static T</code>：表示一个拥有static生命周期的引用，如果一个引用R类型为这个，表示它所引用的数据可以存活相当久，甚至到程序结束才会被回收，此外，它所引用的数据类型是T应该是不可变的。这类引用还有一个要求，就是被引用的数据不可以发生所有权转移，否则数据就被回收了(这里才是限制的目的)，引用将会失效。现在回过头来看，常量们完全符合这两点。</li>
+<li><code>T: &#39;static</code>：表示一个类型约束，要求T是static的，或者说，要求T实例是static的，既然这里是实例，那就和引用没关系了，确实如此；一个T类型满足static要求它本身不是引用类型，且它的成员只能是static约束的，这有点类似Copy的迭代语义；拆开来讲，基本类型和<code>&#39;static</code>引用都是static类型。这种类型有一个特点就是，存活时间可以自己决定，不依赖任何其他条件，想存活多久都可以。</li>
+</ul>
+<p>这里留意到，<code>T: static</code>一定包含<code>&amp;&#39;static T&#39;</code>。所以一个满足static约束的变量，它的直接引用是可以赋值给<code>&amp;&#39;static T</code>类型的参数的。这里直接引用即没有所有权变量的场景。</p>
+<p>所以可以推导出<code>&amp;&#39;static T</code>类型的引用可以运行时生成，而不必像常量那般编译期生成。</p>
+<p>看几个有意思的示例：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">x1</span> = MyType &#123; a: <span class="number">1</span>, b: <span class="number">2</span> &#125;;
+    <span class="keyword">let</span> <span class="variable">x2</span> = MyType &#123; a: <span class="number">1</span>, b: <span class="number">2</span> &#125;;
+    <span class="comment">// x3是&amp;&#x27;static MyType</span>
+    <span class="keyword">let</span> <span class="variable">x3</span> = &amp;MyType &#123; a: <span class="number">1</span>, b: <span class="number">2</span> &#125;;
+    <span class="keyword">let</span> <span class="variable">x</span> = MyType &#123; a: <span class="number">1</span>, b: <span class="number">2</span> &#125;;
+    <span class="keyword">let</span> <span class="variable">x4</span> = &amp;x;
+    <span class="comment">// OK</span>
+    <span class="title function_ invoke__">f1</span>(&amp;x1);
+    <span class="comment">// OK, &amp;&#x27;static T 一定是&#x27;static的</span>
+    <span class="title function_ invoke__">f2</span>(x3);
+    <span class="comment">// OK</span>
+    <span class="title function_ invoke__">f3</span>(x3);
+    <span class="comment">// 错误示范，这里给出解释的可能是，x3是通过匿名变量获取的，x4则是具名变量获取引用</span>
+    <span class="comment">// 这里涉及到只存在引用的临时变量的内存分配策略，这里先挖坑，后面再填，非常不建议这样写！！可能造成不可预知的bug</span>
+    <span class="title function_ invoke__">f3</span>(&amp;x4);
+    <span class="comment">// 错误示范</span>
+    <span class="title function_ invoke__">f2</span>(&amp;x2);
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">f1</span>&lt;T: <span class="symbol">&#x27;static</span>&gt;(v: &amp;T) &#123;
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">f2</span>&lt;T: <span class="symbol">&#x27;static</span>&gt;(v: T) &#123;
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">f3</span>&lt;T&gt;(v: &amp;<span class="symbol">&#x27;static</span> T) &#123;
+&#125;</code></pre>
+
+<p>放几个有用的参考链接：</p>
+<p><a target="_blank" rel="noopener" href="https://github.com/pretzelhammer/rust-blog/blob/master/posts/common-rust-lifetime-misconceptions.md">Common Rust Lifetime Misconceptions</a></p>
+<h4 id="2022-05-30追加-1"><a href="#2022-05-30追加-1" class="headerlink" title="2022-05-30追加"></a>2022-05-30追加</h4><p>最近看了一些关于生命周期的解释，还顺带解释了线程安全一块的，所以在这里统一叙述一下。</p>
+<p>首先需要理解的是，什么是生命周期，说白了<strong>生命周期就是一个区间</strong>，或者理解成一段代码。</p>
+<p>再细节一点，这里指的是引用的<strong>使用区间</strong>，即<strong>引用的合法生命周期</strong>并不是从声明开始的，而是<strong>从第一次使用到最后一次使用这段区间</strong>，才算做生命周期区间。</p>
+<p>除了引用类型，被引用的数据也有生命周期，我们称为本体的生命周期。但是<strong>本体生命周期都是直接和所有权绑定</strong>，即本体存活的区间，一般包括<strong>从定义到最后一次出现</strong>这段区间，所以一般不讨论它们的生命周期。</p>
+<p>如果一个<strong>引用合法</strong>，那么<strong>本体的生命周期</strong>一定<strong>大于等于引用的生命周期</strong>。</p>
+<p>说完了这里，我们要引入一组称为<strong>独立类型</strong>的东西，这类类型拥有<code>&#39;static</code>的生命周期，注意，是具体类型，不是引用类型。拥有<code>&#39;static</code>的引用我们后面再说。</p>
+<p>首先什么是独立类型呢？所有的基本类型，由基本类型组成的类型，如果包含引用，则仅包含<code>&#39;static</code>引用的类型，就是独立类型，比如<code>i32</code>, <code>i64</code>, <code>String</code>, <code>Vec</code>等等。这类类型有一个非常显著的特点，就是它们的<strong>存活时间不依赖任何其他变量</strong>，它们完全可以存活很久直到不再使用，然后被drop。这里突出<strong>不依赖</strong>其他变量，是为了和引用，或者包含引用的类型作对比。</p>
+<p>前面我们说了，引用是否合法依赖于本体在引用的生命周期内(即引用的使用区间内)是否存活(所以就要求本体的生命周期一定要大于等于引用的生命周期)，所以<strong>引用的存活依赖于本体</strong>。所以引用类型不是<code>&#39;static</code>的。当然，有一些引用除外，分别是字面量和全局变量(Rust的全局变量默认不可变)，这些都是硬编码进二进制文件的只读区域的。</p>
+<p>换一种角度来说，只有<strong>存活时间等于程序运行时间的数据的引用，才是<code>&#39;static</code>的引用</strong>，当然也包括对于运行时创建的常量，比如通过Box::leak()强制创建一个存活时间等于程序存活时间的变量，就等于一个常量。所以不管三七二十一，<strong>只要你数据存活时间和程序一样，那你的引用一定是<code>&#39;static</code>的</strong>。</p>
+<p>再来一点，<strong>独立类型的引用，不是<code>&#39;static</code>的</strong>，这点很容易被误会，我们只能得到这样的结论：<strong>独立类型 &lt;&#x3D;&gt; 拥有<code>&#39;static</code>生命周期的类型</strong>。后者只是一种语法约束，当看到这种约束，心里自动转换成这里<strong>需要一个独立类型的变量</strong>就好。</p>
+<p>再来一些细节，如果一个结构体，拥有一个引用字段，那么这个引用字段背后的本体的生命周期一定要大于等于结构体变量的生命周期。因为决定引用生命周期大小的不是引用，而是引用背后的本体。</p>
+<p>假设有类型T(非引用)，设T类型变量的生命周期(本体生命周期)为<code>&#39;T</code>，其包含生命周期为<code>&#39;a</code>的字段，则必然有：<code>&#39;a</code> &gt;&#x3D; <code>&#39;T</code>，如果<code>&#39;a</code>的本体的生命周期为<code>&#39;U</code>，则有：<code>&#39;U</code> &gt;&#x3D; <code>&#39;T</code>。</p>
+<p>为了简述两个生命周期谁大谁小的表达，使用限定语法：<code>T: &#39;a</code>表示T类型的变量的生命周期必须<strong>大于等于</strong><code>&#39;a</code>。来看一个生成包含引用的结构体的函数：</p>
+<pre><code class="highlight rust"><span class="keyword">struct</span> <span class="title class_">MyType</span>&lt;<span class="symbol">&#x27;a</span>, <span class="symbol">&#x27;b</span>, T, U&gt; &#123;
+    v1: &amp;<span class="symbol">&#x27;a</span> T,
+    v2: &amp;<span class="symbol">&#x27;b</span> U,
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">s</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;aaa&quot;</span>);
+    <span class="keyword">let</span> <span class="variable">v</span> = <span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    <span class="keyword">let</span> <span class="variable">t</span> = <span class="title function_ invoke__">gen</span>(&amp;s, &amp;v);
+&#125;
+
+<span class="comment">// 要求t比MyType#v1活得久，u比MyType#v2活得久</span>
+<span class="keyword">fn</span> <span class="title function_">gen</span>&lt;<span class="symbol">&#x27;a</span>, <span class="symbol">&#x27;b</span>, T, U&gt;(t: &amp;<span class="symbol">&#x27;a</span> T, u: &amp;<span class="symbol">&#x27;b</span> U) <span class="punctuation">-&gt;</span> MyType&lt;<span class="symbol">&#x27;a</span>, <span class="symbol">&#x27;b</span>, T, U&gt; &#123;
+    MyType&#123;v1: t, v2: u&#125;
+&#125;</code></pre>
+
+<p>此外，生命周期可以压缩成更小的，反之不行，所以一个拥有<code>&#39;static</code>生命周期的变量var可以赋值给任意的要求生命周期为<code>&#39;a</code>的变量或者函数参数(前提是类型一致)。这里就隐式地包含了大 &#x3D;&gt; 小的转换。来看一个函数：</p>
+<pre><code class="highlight rust"><span class="keyword">const</span> s: &amp;<span class="type">str</span> = <span class="string">&quot;aaa&quot;</span>;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">v</span> = <span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    <span class="comment">// &#x27;static被缩小为&#x27;a，所以可行</span>
+    <span class="title function_ invoke__">f</span>(s);
+    <span class="title function_ invoke__">f</span>(v);
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">f</span>&lt;<span class="symbol">&#x27;a</span>, T: <span class="symbol">&#x27;a</span>&gt;(v: T) &#123;&#125;</code></pre>
+
+<p>说到这里，我们来辨别一下：<code>T: &#39;a</code>, <code>&amp;&#39;a T</code>, <code>T: &#39;static</code>, <code>&amp;&#39;static T</code>四个玩意的关系：</p>
+<ul>
+<li><code>T: &#39;a</code>：表示T拥有比<code>&#39;a</code>更大的生命周期。</li>
+<li><code>&amp;&#39;a T</code>：表示一个生命周期大于<code>&#39;a</code>的类型T的变量的引用，本质是引用，但是引用的本体生命周期大于等于<code>&#39;a</code>，其实就是在**限制T的引用有效范围要大于<code>&#39;a</code>**。</li>
+<li><code>T: &#39;static</code>：表示T是一个独立类型。</li>
+<li><code>&amp;&#39;static T</code>：表示这是一个拥有<code>&#39;static</code>生命周期的引用，注意，不是独立类型的引用。</li>
+</ul>
+<p>第四点，在Rust中只有两种方式可以创建这样的引用，一是字面量，二是全局变量(<strong>因为Rust全局变量不可变，所以就是常量</strong>)，其实还有Box::leak()，这种方式创建了一个生存时间等于程序生存时间的变量，那我们当然就可以把它看成常量，所以它的引用当然就是一个<code>&#39;static</code>的引用。</p>
+<p>其实有一个很常见的场景，就是很多函数签名可能会这么限定：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">f</span>&lt;T&gt;(v: T) <span class="keyword">where</span> T: <span class="symbol">&#x27;static</span> &#123;&#125;</code></pre>
+
+<p>这里其实就暗示了，需要的参数<code>v</code>可能会作为数据依赖使用，或者作为一个新的变量的组成部分，那么我们自然不希望构建的新的变量或者一些运算过程还有被外在的因素影响，我们想要保证<strong>当前函数的所有行为是完全独立自主的</strong>，那么就可以<strong>限定参数类型为独立类型或者常量</strong>。</p>
+<p>在多线程中，<code>&#39;static</code>还有一番作用。首先如果一个数据想要在多线程中使用，那么它要么实现了Send，要么实现了Sync。为什么呢？</p>
+<ul>
+<li>实现了Send保证最多有一个线程拥有数据所有权，即数据只会被一个线程持有，避免了竞争态。</li>
+<li>实现了Sync保证了即使有多个线程访问数据，也不会出错，因为数据被锁等机制同步了，所以确保了访问的有序性。</li>
+</ul>
+<p>说白了就是保证了线程安全，即数据不会被不可预料的更新而产生未知Bug。那么有没有两个都没实现，还想在多线程使用的方式呢？答案就是第三个S：<code>&#39;static</code>。</p>
+<p>实现了<code>&#39;static</code>的类型(非引用)可以被move，即所有的独立类型，都包含实现了Send的隐式含义，所以可以被move，因为保证了准确性，其实这有点和第一个重复了。</p>
+<p>实现了<code>&#39;static</code>的引用，则因为属于常量，不会更改，所以一定可以被安全访问。</p>
+<p>这就是<code>&#39;static</code>在多线程中的意义。</p>
+<p>来看一些使用示例吧：</p>
+<pre><code class="highlight rust"><span class="comment">// 对于常量的引用</span>
+<span class="keyword">const</span> e: &amp;<span class="type">i32</span> = &amp;<span class="number">1</span>;
+<span class="comment">// 常量</span>
+<span class="keyword">const</span> f: MyType = MyType&#123;a: <span class="number">1</span>, b: <span class="number">2</span>, c: <span class="number">3</span>&#125;;
+
+<span class="keyword">struct</span> <span class="title class_">MyType</span> &#123;
+    a: <span class="type">i32</span>,
+    b: <span class="type">i64</span>,
+    c: <span class="type">i32</span>,
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">a</span>: &amp;<span class="symbol">&#x27;static</span> <span class="type">str</span> = <span class="string">&quot;aaa&quot;</span>;
+    <span class="title function_ invoke__">owned_type_or_static_ref</span>(a);
+    <span class="keyword">let</span> <span class="variable">b</span> = <span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    <span class="title function_ invoke__">owned_type_or_static_ref</span>(b);
+    <span class="keyword">let</span> <span class="variable">c</span> = <span class="built_in">vec!</span>[<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>];
+    <span class="title function_ invoke__">ref_to_owned_type</span>(&amp;c);
+    <span class="keyword">let</span> <span class="variable">d</span>: &amp;<span class="symbol">&#x27;static</span> <span class="type">str</span> = <span class="string">&quot;bbb&quot;</span>;
+    <span class="title function_ invoke__">only_static_ref_of_str</span>(d);
+    <span class="title function_ invoke__">only_static_ref</span>(e);
+    <span class="title function_ invoke__">only_static_ref</span>(&amp;f);
+&#125;
+
+<span class="comment">// 限定传入的类型为独立类型或者常量引用</span>
+<span class="keyword">fn</span> <span class="title function_">owned_type_or_static_ref</span>&lt;T: <span class="symbol">&#x27;static</span>&gt;(a: T) &#123;&#125;
+
+<span class="comment">// 限定传入的类型为独立类型的引用</span>
+<span class="keyword">fn</span> <span class="title function_">ref_to_owned_type</span>&lt;T: <span class="symbol">&#x27;static</span>&gt;(a: &amp;T) &#123;&#125;
+
+<span class="comment">// 限定传入的类型为常量引用</span>
+<span class="keyword">fn</span> <span class="title function_">only_static_ref</span>&lt;T&gt;(a: &amp;<span class="symbol">&#x27;static</span> T) &#123;&#125;
+
+<span class="comment">// 使用泛型会因为str无法编译时确定大小而无法通过，所以对于str特殊处理一下</span>
+<span class="keyword">fn</span> <span class="title function_">only_static_ref_of_str</span>(a: &amp;<span class="symbol">&#x27;static</span> <span class="type">str</span>) &#123;&#125;</code></pre>
+
+<p>参考自知乎一位老哥：</p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/360342782">Rust那些难理解的点(大量更新于6月16日）</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/362285521">多线程编程的秘密：Sync, Send, and ‘Static</a></p>
+<p><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/384151733">Rust: Lifetime 解惑， 生命周期还在</a></p>
+<p><a target="_blank" rel="noopener" href="https://doc.rust-lang.org/rust-by-example/scope/lifetime/static_lifetime.html">官方文档对于static标注的解释</a></p>
+<h3 id="函数式编程"><a href="#函数式编程" class="headerlink" title="函数式编程"></a>函数式编程</h3><h4 id="闭包"><a href="#闭包" class="headerlink" title="闭包"></a>闭包</h4><p>闭包可以理解成匿名函数，和Go差不多，也会捕获上下文，但是因为Rust存在所有权，所以这里涉及到对于上下文变量的所有权&#x2F;引用的捕获。按照这一规则，把闭包划分成三个类别：</p>
+<ul>
+<li>FnOnce：如果闭包转移了所有权，则属于。</li>
+<li>FnMut：如果闭包没有转移所有权，但是获得了可变引用，则属于。</li>
+<li>Fn：如果闭包没有转移所有权，也没有进行更改，则属于。</li>
+</ul>
+<p>这里需要注意的是，闭包的实现决定了它属于那个特征，而不是特征决定了闭包的实现。此外，一个闭包可以实现多个特征。</p>
+<p>三个特征有如下关系：<strong>Fn: FnMut: FnOnce</strong></p>
+<p>这里还需要注意，闭包实现了哪个特征取决于它是怎么<strong>使用</strong>捕获变量的，而不是怎么捕获的，这里强调使用。后面的move关键词强调<strong>捕获</strong>。这里给出一个例子方便理解：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">s1</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;s1&quot;</span>);
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">s2</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;s2&quot;</span>);
+    <span class="keyword">let</span> <span class="variable">s3</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;s3&quot;</span>);
+    <span class="comment">// 对应FnOnce，因为这里使用了s1，而不是它的引用，所有权被转移到了s1中</span>
+    <span class="keyword">let</span> <span class="variable">closure1</span> = || &#123;
+        <span class="keyword">let</span> <span class="variable">ss1</span> = s1;
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;:?&#125;&quot;</span>, ss1);
+    &#125;;
+    <span class="comment">// 到这里，s1的所有权不在了</span>
+
+    <span class="comment">// 注意看push_str的签名：push_str(&amp;mut self, string: &amp;str)</span>
+    <span class="comment">// push_str是使用s2的可变引用处理的，所以这里使用了可变引用，所以没发生所有权转移，即使我们直接把s2写在了闭包里</span>
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">closure2</span> = || &#123;
+        s2.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;_1&quot;</span>);
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, s2);
+    &#125;;
+    <span class="keyword">let</span> <span class="variable">closure3</span> = || &#123;
+        <span class="comment">// 这里说明一下，println!的签名是println!(fmt: $($arg:tt)*)，使用了引用，所以刚好符合不可变引用的使用</span>
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, s3);
+    &#125;;
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, s3);
+    <span class="title function_ invoke__">closure1</span>();
+    <span class="title function_ invoke__">closure2</span>();
+    <span class="title function_ invoke__">closure3</span>();
+&#125;</code></pre>
+
+<p>上面提到了move关键词，这个关键词的意义在于，强制转移变量所有权到闭包中，其实按理说如果闭包使用了所有权，那就会发生所有权转移，但是在过去某个版本中，出现过bug，所以出现了这个关键词，用来显示地表达转移语义。这一般用于想要在新的线程中执行闭包。</p>
+<p>闭包本质是三种特征的实现，所以它们可以作为函数参数，函数返回值，结构体字段，当然，同之前特征的特点一样，返回值或者参数只能是impl Fn&#x2F;FnMut&#x2F;FnOnce这样的形式。如果想要实现动态返回，只能通过特征对象的形式处理。</p>
+<p>此外，不同Go对于函数类型的定义，Rust中<strong>每一个闭包实例都有自己独一无二的类型</strong>，而不是仅仅满足签名一致。</p>
+<p>重新回到三种闭包类型：</p>
+<ul>
+<li>每一个闭包都实现了FnOnce。假设是FnMut的闭包，那它相当于获得了可变引用的Copy。</li>
+<li>没有获得所有的闭包实现了FnMut。</li>
+<li>没有更改引用的闭包实现了Fn。</li>
+</ul>
+<p>所以我们才有：<code>Fn: FnMut</code>，<code>FnMut: FnOnce</code>这样的关系。</p>
+<h4 id="2022-08-18追加"><a href="#2022-08-18追加" class="headerlink" title="2022-08-18追加"></a>2022-08-18追加</h4><p>关于闭包，move，闭包类型，以及被捕获的变量如何释放等问题的思考。</p>
+<p>首先是闭包的定义，可以把<strong>每一种闭包理解成一个结构体+方法</strong>，闭包捕获的<strong>环境变量就是结构体的字段</strong>。而闭包<strong>如何使用被捕获变量决定了方法实现了哪种闭包trait</strong>。</p>
+<p>所以如果一个闭包显示使用move转移所有权，但是又仅使用了变量的引用，那么就可以理解成下面的形式：</p>
+<pre><code class="highlight rust"><span class="keyword">struct</span> <span class="title class_">Closure</span> &#123;
+    arg1: <span class="type">String</span>,
+&#125;
+
+<span class="keyword">impl</span> <span class="title class_">Closure</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">closure</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">str_mut_ref</span> = &amp;<span class="keyword">mut</span> <span class="keyword">self</span>.arg1;
+        <span class="comment">// some work... ...</span>
+    &#125;
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">s</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;text&quot;</span>);
+    <span class="comment">// 闭包捕获环境变量，并转移所有权</span>
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">fn_mut_closure</span> = Closure &#123;
+        arg1: s,
+    &#125;;
+    <span class="comment">// 但是闭包仅仅用到了可变引用</span>
+    fn_mut_closure.<span class="title function_ invoke__">closure</span>();
+    <span class="comment">// 随着闭包结构体变量被释放，被捕获的环境变量也被释放</span>
+&#125;</code></pre>
+
+
+
+<h4 id="迭代器"><a href="#迭代器" class="headerlink" title="迭代器"></a>迭代器</h4><p>Rust迭代器也有三种，分别对应Rust的三种变量使用方式：</p>
+<ul>
+<li>.iter()：迭代值为不可变引用</li>
+<li>.mut_iter()：迭代值为可变引用</li>
+<li>.into_iter()：迭代值为所有权变量</li>
+</ul>
+<p>此外，迭代器还能进行混搭，实现流式处理，比如filter，map这些，它们被称为迭代器适配器，当然还要有一个最终实现迭代结果收集的方式，比如collect，称为迭代器消费器。</p>
+<p>迭代器是惰性的，这句话的意思是迭代器在定义，在获取迭代器变量时，并不会发生迭代，只有通过变量调用迭代方法，比如next，才会发生数据迭代。</p>
+<h3 id="智能指针"><a href="#智能指针" class="headerlink" title="智能指针"></a>智能指针</h3><p>首先提一下智能指针的Deref这个特征，它主要实现获取智能指针内部数据的引用，所以所有的对于指针指针的解引用操作，都会转变成先获取内部数据的引用，而后解引用，虽然绕了一大圈，但是可以拿到内部数据的影子变量，而不是本体：</p>
+<pre><code class="highlight rust"><span class="keyword">let</span> <span class="variable">x</span> = <span class="type">Box</span>::<span class="title function_ invoke__">new</span>(<span class="number">1</span>);
+<span class="keyword">let</span> <span class="variable">y</span> = *x + <span class="number">1</span>; <span class="comment">// 等价于下一个</span>
+<span class="keyword">let</span> <span class="variable">z</span> = *(x.<span class="title function_ invoke__">deref</span>()) + <span class="number">1</span>;</code></pre>
+
+
+
+<p>这里直接给出一个总览：</p>
+<ul>
+<li>Box：把对象强制分配在堆上，并且得到一个栈结构体，保存着堆内存的指针；用于想要通过指针传递处理对象但是还想保存所有权时。</li>
+<li>Rc：用于生成一个对象的多个所有权，引用计数，当且仅当计数为零时释放，但是它内部对于计数器的操作是内存不安全的。</li>
+<li>Arc：弥补了上面的不安全计数器，所以可以用于多线程。</li>
+<li>Cell：包装一个对象，并通过Cell实例更新对象，有点类似通过结构体更新结构体字段的意思。</li>
+<li>RefCell：处理编译器无法正确处理处理的可变&#x2F;不可变引用共存问题，把引用检查推迟到运行期。</li>
+</ul>
+<p>说明，Cell对于传入值的类型是否实现了Copy分为了两类API，如果实现了Copy，则在获取被包装的值时，会获取到拥有所有权的值的拷贝。而在没有实现Copy情况下，获取到的值也是被包装值的拷贝，但是同时转移所有权，Cell内部不再持有这个值。</p>
+<p>RefCell可以用于对于某一对象的更新，因为想要通过引用更新，需要先基于此对象获取可变引用，然后更新，而后面想要读取，还要再次获取不可变引用，很麻烦，通过RefCell则可以一步到位，但是依旧遵循引用共存原则，所以需要考虑适当的划分作用域来确保引用不冲突。</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">s1</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;aaa&quot;</span>);
+    <span class="keyword">let</span> <span class="variable">c1</span> = Cell::<span class="title function_ invoke__">new</span>(s1);
+    c1.<span class="title function_ invoke__">set</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;bbb&quot;</span>));
+    <span class="built_in">assert_eq!</span>(c1.<span class="title function_ invoke__">take</span>(), <span class="string">&quot;bbb&quot;</span>.<span class="title function_ invoke__">to_string</span>());
+    <span class="keyword">let</span> <span class="variable">s2</span> = <span class="string">&quot;aaa&quot;</span>;
+    <span class="keyword">let</span> <span class="variable">c2</span> = Cell::<span class="title function_ invoke__">new</span>(s2);
+    c2.<span class="title function_ invoke__">set</span>(<span class="string">&quot;bbb&quot;</span>);
+    <span class="built_in">assert_eq!</span>(<span class="string">&quot;bbb&quot;</span>, c2.<span class="title function_ invoke__">take</span>());
+    <span class="keyword">let</span> <span class="variable">s3</span> = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;ccc&quot;</span>);
+    <span class="keyword">let</span> <span class="variable">rc1</span> = RefCell::<span class="title function_ invoke__">new</span>(s3);
+    &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">mut_rc1</span> = rc1.<span class="title function_ invoke__">borrow_mut</span>();
+        mut_rc1.<span class="title function_ invoke__">push_str</span>(<span class="string">&quot;_ddd&quot;</span>);
+    &#125;
+    <span class="keyword">let</span> <span class="variable">rc11</span> = rc1.<span class="title function_ invoke__">borrow</span>();
+    <span class="built_in">assert_eq!</span>(<span class="string">&quot;ccc_ddd&quot;</span>, rc11.<span class="title function_ invoke__">as_str</span>())
+&#125;</code></pre>
+
+<p>这里给出一个RefCell和Rc混合的用法，以此实现通过<strong>多个可变引用相互独立地更新值</strong>，这在单可变引用是不能实现的：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">v</span> = <span class="number">0</span>;
+    <span class="keyword">let</span> <span class="variable">r</span> = RefCell::<span class="title function_ invoke__">new</span>(v);
+    <span class="keyword">let</span> <span class="variable">rc1</span> = Rc::<span class="title function_ invoke__">new</span>(r);
+    <span class="keyword">let</span> <span class="variable">rc2</span> = rc1.<span class="title function_ invoke__">clone</span>();
+    <span class="keyword">let</span> <span class="variable">rc3</span> = rc1.<span class="title function_ invoke__">clone</span>();
+    *rc2.<span class="title function_ invoke__">borrow_mut</span>() += <span class="number">1</span>;
+    *rc3.<span class="title function_ invoke__">borrow_mut</span>() += <span class="number">1</span>;
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc1.<span class="title function_ invoke__">borrow</span>());
+&#125;</code></pre>
+
+<h4 id="2022-06-09追加"><a href="#2022-06-09追加" class="headerlink" title="2022-06-09追加"></a>2022-06-09追加</h4><p>现在来填补Cell和RefCell的坑。</p>
+<p>首先先来思考一件事，想要更新结构体字段，是不是需要把结构体变量设置为<code>mut</code>的？</p>
+<pre><code class="highlight rust"><span class="keyword">struct</span> <span class="title class_">MyType</span> &#123;
+    a: <span class="type">i32</span>,
+    b: <span class="type">i64</span>,
+    c: <span class="type">i32</span>,
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">t1</span> = MyType &#123;
+        a: <span class="number">1</span>,
+        b: <span class="number">2</span>,
+        c: <span class="number">3</span>,
+    &#125;;
+    <span class="comment">// 报错</span>
+    t1.a = <span class="number">11</span>;
+&#125;</code></pre>
+
+<p>假如我有一个需求，想要保证父变量不可变，而子变量可变，该怎么实现呢？你是不是觉得我在虚构一个不存在的场景？其实这是很常见的，比如函数参数传递只希望更新某一字段，而不希望接收方无意更改其他字段。那么该怎么实现这样的功能呢？</p>
+<p>答案就是<strong>内部可变性</strong>，说白了，通过<strong>设置结构体某一字段所处的内存空间为可变的，而后跳过结构体直接对该空间进行读写</strong>，进而实现所需的功能。内部可变性一般是由编译器来实现，手动实现比较复杂且涉及到unsafe，好在，Rust提供了Cell和RefCell来帮助我们。</p>
+<p>来看一张图：</p>
+<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/refcell_cell.svg"></p>
+<p>当然了，实际的实现可能没这么粗糙，这里只是简单示意一下可能的实现。</p>
+<p>那么问题来了，Cell和RefCell的区别在哪？我认为区别只有一个：<strong>Cell直接更新内存空间，RefCell通过得到引用，而后解引用去更新内存空间</strong>。可见后者多了一个取地址和解引用的过程，正是因为不是所有时候都需要转移所有权，所以Rust也提供了借助引用访问这块可更新内存区域的方式，即RefCell。同时RefCell也通过运行时进行借用规则检查，确保满足借用之间不冲突。</p>
+<p>说白了<strong>RefCell只是Cell的引用形式，就和普通变量和它的引用一样的关系</strong>。如下所示：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">a</span> = Cell::<span class="title function_ invoke__">new</span>(<span class="number">1</span>);
+    <span class="keyword">let</span> <span class="variable">b</span> = RefCell::<span class="title function_ invoke__">new</span>(<span class="number">1</span>);
+    
+    <span class="keyword">let</span> <span class="variable">a_rc</span> = Rc::<span class="title function_ invoke__">new</span>(a);
+    <span class="keyword">let</span> <span class="variable">b_rc</span> = Rc::<span class="title function_ invoke__">new</span>(b);
+    
+    <span class="keyword">let</span> <span class="variable">a_rc1</span> = a_rc.<span class="title function_ invoke__">clone</span>();
+    <span class="keyword">let</span> <span class="variable">a_rc2</span> = a_rc.<span class="title function_ invoke__">clone</span>();
+    
+    <span class="keyword">let</span> <span class="variable">b_rc1</span> = b_rc.<span class="title function_ invoke__">clone</span>();
+    <span class="keyword">let</span> <span class="variable">b_rc2</span> = b_rc.<span class="title function_ invoke__">clone</span>();
+    
+    a_rc1.<span class="title function_ invoke__">set</span>(a_rc1.<span class="title function_ invoke__">get</span>() + <span class="number">1</span>);
+    a_rc2.<span class="title function_ invoke__">set</span>(a_rc2.<span class="title function_ invoke__">get</span>() + <span class="number">1</span>);
+    
+    *b_rc1.<span class="title function_ invoke__">borrow_mut</span>() += <span class="number">1</span>;
+    *b_rc2.<span class="title function_ invoke__">borrow_mut</span>() += <span class="number">1</span>;
+    
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, a_rc.<span class="title function_ invoke__">get</span>()); <span class="comment">// 3</span>
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, *b_rc.<span class="title function_ invoke__">borrow</span>()); <span class="comment">// 3</span>
+&#125;</code></pre>
+
+<p>很清晰易懂不是吗？</p>
+<h4 id="2022-07-04追加"><a href="#2022-07-04追加" class="headerlink" title="2022-07-04追加"></a>2022-07-04追加</h4><p>直接看代码：</p>
+<pre><code class="highlight rust"><span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="variable">str1</span> = Cell::<span class="title function_ invoke__">new</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;str1&quot;</span>));
+    <span class="keyword">let</span> <span class="variable">rc_str1_1</span> = Rc::<span class="title function_ invoke__">new</span>(str1);
+    <span class="keyword">let</span> <span class="variable">rc_str1_2</span> = Rc::<span class="title function_ invoke__">clone</span>(&amp;rc_str1_1);
+    rc_str1_2.<span class="title function_ invoke__">set</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;str1_1&quot;</span>));
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc_str1_1.<span class="title function_ invoke__">take</span>()); <span class="comment">// str1_1</span>
+    <span class="comment">// Cell构建出的变量只能获取所有权形式的内部值，无法获取内部值的引用，再次获取只会读到默认值</span>
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc_str1_2.<span class="title function_ invoke__">take</span>()); <span class="comment">// &quot;&quot;</span>
+    <span class="keyword">let</span> <span class="variable">str2</span> = RefCell::<span class="title function_ invoke__">new</span>(<span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;str2&quot;</span>));
+    <span class="keyword">let</span> <span class="variable">rc_str2_1</span> = Rc::<span class="title function_ invoke__">new</span>(str2);
+    <span class="keyword">let</span> <span class="variable">rc_str2_2</span> = Rc::<span class="title function_ invoke__">clone</span>(&amp;rc_str2_1);
+    <span class="comment">// RefCell构建的变量可以获取内部值的引用，并通过引用进行读写</span>
+    *rc_str2_2.<span class="title function_ invoke__">borrow_mut</span>() = <span class="type">String</span>::<span class="title function_ invoke__">from</span>(<span class="string">&quot;str2_2&quot;</span>);
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc_str2_1.<span class="title function_ invoke__">borrow</span>()); <span class="comment">// str2_2</span>
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc_str2_2.<span class="title function_ invoke__">borrow</span>()); <span class="comment">// str2_2</span>
+    <span class="comment">// RefCell也可以直接获取所有权，所有权一旦转移，再次获取只会获取到默认值，相当于获取到零值</span>
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc_str2_1.<span class="title function_ invoke__">take</span>()); <span class="comment">// str2_2</span>
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, rc_str2_2.<span class="title function_ invoke__">take</span>()); <span class="comment">// &quot;&quot;</span>
+&#125;</code></pre>
+
+<p>更前面的代码的内部类型(i32)实现了Copy，所以有争议，这次拿String作为内部类型来分析。</p>
+<p>**Cell和RefCell最大的区别就是后者可以获取被包裹的内部变量的引用(可变&#x2F;不可变均可)**，而Cell每次读取只能转移内部变量所有权，RefCell除了转移所有权之外；也也可以不转移所有权，只是简单地获取引用类型。说白了内部变量的所有权归(Ref)Cell所有，但是呢，RefCell还可以提供引用的访问形式。</p>
+<p>所以如果在某个<strong>需要内部可变性的场景</strong>，在<strong>读写被包裹的变量且不想获得所有权时，只能使用RefCell</strong>。</p>
+<h4 id="2022-08-17追加"><a href="#2022-08-17追加" class="headerlink" title="2022-08-17追加"></a>2022-08-17追加</h4><p>Rc本身是做多所有权使用的，由于Rust不允许多个可变引用存在，所以Rc默认所有的所有权都是不可变的(引用计数像不像多引用？)，如果想要通过这种多所有权实现可变，则需要使用内部可变性，即Cell&#x2F;RefCell。</p>
+<p>所以一般都是Rc和Cell&#x2F;RefCell搭配使用就是这个原因，因为单单获取不可变所有权没啥意义不是吗？</p>
+<h3 id="多线程和并发"><a href="#多线程和并发" class="headerlink" title="多线程和并发"></a>多线程和并发</h3><p>Rust的多线程默认为系统线程，即<code>1:1</code>的关系，这里的使用和其他语言无异。此外前面提过，新建线程对于上下文变量的捕获，需要使用move关键词显示地移动所有权。</p>
+<p>多线程之间的同步方式既可以使用普通的锁，即Mutex，也可以使用管道，是的没错，就是Go的chan类型的管道，而且同样支持设置缓冲区大小，管道所提供的顺序访问也同Go一致。但是这里需要注意的是，std的管道仅支持多生产者单消费者模型，如果想要支持多消费者，需要引入第三方库。</p>
+<p>上面提到了Mutex锁，Mutex本身也可以提供内部可变性，但是这个可变性是跨越多个线程的，什么意思呢？在别的语言中，我们可能只是用锁来实现同步访问，来阻塞线程和释放锁，而Rust的Mutex则把需要限制访问的资源放进了Mutex中，在获取到锁之后，直接从Mutex读取临界区资源即可，而不用读取独立的变量。此外也可以直接在获取到锁之后，执行读写操作，实现对Mutex包含变量的更新，所以我们才说Mutex实现了内部可变性。</p>
+<p>这样来看，Rc+RefCell的组合适用于单线程，而Arc+Mutex的组合适用于多线程，都可以用来实现对于同一资源的多操作更新。</p>
+<p>除了锁和管道之外，Rust还提供了原子操作，这里也是和其他语言类似，但是需要说明的是，Rust的原子操作囊括了内存可见性，又或者说同时实现了内存屏障。</p>
+<p>首先需要指出的是，原子操作在执行操作时，需要手动指明针对被操作的变量，应该赋予什么屏障，而后才会进行相关的操作，比如加减等操作。</p>
+<p>Rust提供了四种内存屏障，这个其他语言也是类似的，在展开之前，先来了解一下什么是内存屏障。</p>
+<p>来看一个传统CPU的执行过程：</p>
+<ul>
+<li>根据PC读取指令</li>
+<li>解码指令，包括分离操作数和操作指令</li>
+<li>执行指令，把操作数和指令发送到执行单元，比如加法单元，执行操作</li>
+<li>访问内存，根据指令需要的内存地址，去访问内存中的数据，这里可能因为内存过慢而发生等待，即等待内存数据载入CPU缓存或者寄存器</li>
+<li>写回数据，包括写入到寄存器文件，或者写入到主存，如果是主存，还是可能发生等待</li>
+<li>更新PC</li>
+</ul>
+<p>这里注意到，访问内存和写回数据是存在等待的，实际上，这个等待间隔可以长达几百上千个CPU周期，属于典型的浪费了。</p>
+<p>那么有没有别的方式呢？资本家跳了出来！说我们流水线的工人不存在这一点，如果流水线A+流水线B可以获得流水线C，那我们就会分离开A和B，让他们独立运行，而不是先运行A再运行B，最后由C组装，这样是很慢的。CPU设计者们恍然大悟！既然指令是顺序执行而产生的等待，那我不顺序执行不就好了，就像流水线生产，造鞋子和造手机的流水线互不干扰，那么上述过程能否也这么实现呢？</p>
+<p>当然是可以，这种实现称为乱序执行，即打乱指令的执行顺序，尽可能保证执行车间一直是满载状态。但是前提是不存在数据依赖和指令跳转。原因很好理解，数据依赖导致执行顺序无法乱序，跳转则是涉及到全新的执行流，需要清空流水线。</p>
+<p>想象一下，一段代码中，只有通过常量对两个变量的赋值操作，那么他们不依赖任何数据，所以可以使用乱序执行，第一条赋值结束立马跟上第二条，让赋值执行单元满载，而不用等到第一条赋值完并且写入寄存器文件再执行下一条。</p>
+<p>此外，这样的执行方式还可能重排顺序，比如两个整型操作和一个浮点操作穿插，则可以合并两个整型操作，或者两个常量赋值操作可能会被合并到一个变量赋值操作之前。</p>
+<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/5E374DAC-C381-4973-A31C-E392FCE52D3B_1_105_c.png" alt="5E374DAC-C381-4973-A31C-E392FCE52D3B_1_105_c"></p>
+<p>现在可以看到指令重排序在CPU层级的原因了。当然还有编译器级别的实现，这里不再展开赘述。</p>
+<p>在一个单CPU程序中，则有变量访问于读写顺序，等同于书写顺序，因为即使存在重排序，但是它们都依赖同一CPU缓存，所以可见性的先后顺序不会发生改变，同时CPU在重排序时也不会重排有数据依赖的指令。但是在多CPU程序中，则无法通过当前CPU限制另一CPU对于指令重排的情况，所以可能会读到重排后的结果，而影响自身的执行结果。</p>
+<p>一个很常见的情况就是线程A依赖变量flag为真，而后使用值value，其中flag由假变为真发生在线程B中，且发生在value赋值之后，但是二者顺序可能因为前面的bool操作而追求流水线满载，进而把flag重排在value赋值之前，毕竟对于B来说，重排二者没什么影响。但是对A影响就大了。</p>
+<p>为了避免这种情况，我们需要内存屏障来限制读写操作的先后顺序。</p>
+<p>Rust有如下内存屏障，除了第一种表示不加内存屏障之外，其他的则是编程界基本都有的：</p>
+<ul>
+<li>Relaxed：等于没有屏障</li>
+<li>Release：等于SS屏障，即当前操作<strong>之前的写</strong>操作不会被重排，之后的操作不保证。</li>
+<li>Acquire：等于LL屏障，即当前操作<strong>之后的读</strong>操作不会被重排，之前的操作不保证。</li>
+<li>AcqRel：等于LS屏障，即Release+Acquire。</li>
+<li>SeqCst：等于SL屏障，即当前操作之前的读写不会被重排，之后的读写也不会被重排，加强版了属于是。</li>
+</ul>
+<p>此外，还有两个和多线程相关的特征：</p>
+<ul>
+<li>T: Send：表示T类型的变量可以在线程之间转移所有权。</li>
+<li>T: Sync：表示T类型的不可变引用可以在线程之间共享。</li>
+</ul>
+<p>一般类型都实现了这两个玩意，除非你显示地通过<code>!Sync/!Send</code>去排除。当然你也可以手动为那些没实现的类型实现，但是不建议。</p>
+<p>给一个不错的文章讲解<a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/102307258">内存屏障</a></p>
+<h4 id="2022-06-7追加"><a href="#2022-06-7追加" class="headerlink" title="2022-06-7追加"></a>2022-06-7追加</h4><p>这里补充一些关于Send和Sync的概念，同时补充一些关于内部可变性的理解。首先是<strong>如果&amp;T是Send的，那么T一定是Sync的</strong>。这个推论其实很好理解，如果通过变量的多个引用可以在多个线程里安全的读写变量，那么变量本身肯定加了线程安全不是吗？</p>
+<p>此外，Arc实现的多所有权适用于多线程，但是仅限让多个线程拥有所有权和读取，什么意思呢？就好比你<strong>只是拿到了一个不可变的所有权变量</strong>，仅此而已。所以需要搭配内部可变性使用，<strong>内部可变性相当于针对内部的值，封装了一个可变引用+不可变引用</strong>，然后你就可以进行读写了。内部可变性包装的值是被共享的，但是内部可变性这个变量可不是，所以需要借助Arc生成它的多个所有权变量，传递给多个线程。</p>
+<pre><code class="highlight rust"><span class="meta">#[derive(Debug)]</span>
+<span class="keyword">struct</span> <span class="title class_">MyType</span> &#123;
+    a: <span class="type">i32</span>,
+    b: <span class="type">i32</span>,
+&#125;
+
+<span class="keyword">fn</span> <span class="title function_">main</span>() &#123;
+    <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">v</span> = MyType&#123;a: <span class="number">1</span>, b: <span class="number">2</span>&#125;;
+    <span class="keyword">let</span> <span class="variable">v1</span> = Arc::<span class="title function_ invoke__">new</span>(v);
+    <span class="keyword">let</span> <span class="variable">v2</span> = Arc::<span class="title function_ invoke__">clone</span>(&amp;v1);
+    <span class="keyword">let</span> <span class="variable">v3</span> = Arc::<span class="title function_ invoke__">clone</span>(&amp;v1);
+    <span class="comment">// 下面会报错，因为无法Arc包裹得到的所有权仅仅是一个只读的且无法更改这一特点</span>
+    <span class="keyword">let</span> <span class="variable">_</span> = thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+        v1.a += <span class="number">1</span>;
+        v1.b += <span class="number">1</span>;
+    &#125;).<span class="title function_ invoke__">join</span>();
+    <span class="keyword">let</span> <span class="variable">_</span> = thread::<span class="title function_ invoke__">spawn</span>(<span class="keyword">move</span> || &#123;
+        v2.a += <span class="number">1</span>;
+        v2.b += <span class="number">1</span>;
+    &#125;).<span class="title function_ invoke__">join</span>();
+    <span class="built_in">println!</span>(<span class="string">&quot;&#123;:?&#125;&quot;</span>, v3);
+&#125;</code></pre>
+
+<h3 id="异步编程"><a href="#异步编程" class="headerlink" title="异步编程"></a>异步编程</h3><p>首先先来看一个整体架构图：</p>
+<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/async_await.svg"></p>
+<p>Rust对于异步的支持，仅限提供了一个标准，而实际对于异步函数的执行，则是由第三方运行时去实现。怎么理解呢？</p>
+<p>首先，Rust对于异步这一块，提供了两个关键字：<code>async</code>和<code>await</code>。Rust的异步执行逻辑则是<strong>延迟执行</strong>。当我们使用a<strong>sync去修饰函数，代码块</strong>时，会得到一个由编译器生成的<strong>实现了Future特征的匿名结构体</strong>。而Future特征就是异步任务被执行的关键。</p>
+<p>对于异步任务的触发，则是需要在异步方法后调用await关键字，触发对于Future状态的推进；当前Future的执行由外层Future负责(隐式说明await只能在异步中调用)，而<strong>最外层的Future的触发，则是运行时处理</strong>，在这里选择Tokio。</p>
+<p>来看一个图：</p>
+<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/tokio_runtime.svg"></p>
+<p>上图的由await推进可能有点不准确，准确来说应该是await+tokio推进，await会尝试把Future通过Tokio的方法包装成Task并递交到Tokio的任务队列中，设置唤醒器等操作。</p>
+<h3 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h3><p>其实到这里，基本就结束了，Rust的语法已经没了，而且编程本身就是实践出真理，建议大家直接移步项目部分，看一些项目实战。在这里我选择直接学习Hyper的使用和actix-web，并选择后者去构建一个小的CRUD后端服务。</p>
+<p>关于Tokio这里选择埋坑，因为Tokio的实现，对于Future的调度策略这里都没有提及，后续等使用结束会重新回填这个坑。</p>
+<p>一些感悟：其实Rust没有想象中的那么难，习惯了它的思想就可以熟练编写了，不要把它当成特别奇怪的分类来对待，当然，多写才是最重要的不是吗？</p>
+<h3 id="一些数据结构"><a href="#一些数据结构" class="headerlink" title="一些数据结构"></a>一些数据结构</h3><h4 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h4><pre><code class="highlight rust"><span class="keyword">use</span> std::cell::Cell;
+<span class="keyword">use</span> std::rc::Rc;
+
+<span class="keyword">struct</span> <span class="title class_">List</span>&lt;T&gt; <span class="keyword">where</span> T: <span class="symbol">&#x27;static</span> + <span class="built_in">Clone</span> &#123;
+    size: <span class="type">usize</span>,
+    head: <span class="type">Option</span>&lt;Rc&lt;<span class="type">Box</span>&lt;Node&lt;T&gt;&gt;&gt;&gt;,
+    tail: <span class="type">Option</span>&lt;Rc&lt;<span class="type">Box</span>&lt;Node&lt;T&gt;&gt;&gt;&gt;,
+&#125;
+
+<span class="keyword">struct</span> <span class="title class_">Node</span>&lt;T&gt; <span class="keyword">where</span> T: <span class="symbol">&#x27;static</span> + <span class="built_in">Clone</span> &#123;
+    value: T,
+    <span class="comment">// Cell实现内部可变性，Option实现存在性，Rc实现多引用，Box实现固定大小</span>
+    prev: Cell&lt;<span class="type">Option</span>&lt;Rc&lt;<span class="type">Box</span>&lt;Node&lt;T&gt;&gt;&gt;&gt;&gt;,
+    next: Cell&lt;<span class="type">Option</span>&lt;Rc&lt;<span class="type">Box</span>&lt;Node&lt;T&gt;&gt;&gt;&gt;&gt;,
+&#125;
+
+<span class="keyword">impl</span>&lt;T&gt; List&lt;T&gt; <span class="keyword">where</span> T: <span class="symbol">&#x27;static</span> + <span class="built_in">Clone</span> &#123;
+    <span class="keyword">fn</span> <span class="title function_">new</span>() <span class="punctuation">-&gt;</span> <span class="keyword">Self</span> &#123;
+        List &#123;
+            size: <span class="number">0</span>,
+            head: <span class="literal">None</span>,
+            tail: <span class="literal">None</span>,
+        &#125;
+    &#125;
+
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">push_back</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, value: T) &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="keyword">let</span> <span class="variable">node</span> = Node &#123;
+                value,
+                prev: Cell::<span class="title function_ invoke__">new</span>(<span class="literal">None</span>),
+                next: Cell::<span class="title function_ invoke__">new</span>(<span class="literal">None</span>),
+            &#125;;
+            <span class="keyword">let</span> <span class="variable">node_rc</span> = Rc::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(node));
+            <span class="keyword">self</span>.head = <span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(&amp;node_rc));
+            <span class="keyword">self</span>.tail = <span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(&amp;node_rc));
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="keyword">let</span> <span class="variable">node_prev</span>;
+            <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> tail_val) = <span class="keyword">self</span>.tail &#123;
+                <span class="comment">// 读取旧尾节点并增加其Rc</span>
+                node_prev = Rc::<span class="title function_ invoke__">clone</span>(tail_val);
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="built_in">panic!</span>()
+            &#125;
+            <span class="comment">// 构建节点</span>
+            <span class="keyword">let</span> <span class="variable">node</span> = Node &#123;
+                value,
+                <span class="comment">// 设置前驱节点</span>
+                prev: Cell::<span class="title function_ invoke__">new</span>(<span class="title function_ invoke__">Some</span>(node_prev)),
+                next: Cell::<span class="title function_ invoke__">new</span>(<span class="literal">None</span>),
+            &#125;;
+            <span class="keyword">let</span> <span class="variable">node_rc</span> = Rc::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(node));
+            <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> tail_val) = <span class="keyword">self</span>.tail &#123;
+                <span class="comment">// 设置旧尾节点的后缀节点</span>
+                tail_val.next.<span class="title function_ invoke__">set</span>(<span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(&amp;node_rc)));
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="built_in">panic!</span>()
+            &#125;
+            <span class="comment">// 更新尾节点为新的节点</span>
+            <span class="keyword">self</span>.tail = <span class="title function_ invoke__">Some</span>(node_rc);
+        &#125;
+        <span class="keyword">self</span>.size += <span class="number">1</span>;
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">push_front</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>, value: T) &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="keyword">let</span> <span class="variable">node</span> = Node &#123;
+                value,
+                prev: Cell::<span class="title function_ invoke__">new</span>(<span class="literal">None</span>),
+                next: Cell::<span class="title function_ invoke__">new</span>(<span class="literal">None</span>),
+            &#125;;
+            <span class="keyword">let</span> <span class="variable">node_rc</span> = Rc::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(node));
+            <span class="keyword">self</span>.head = <span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(&amp;node_rc));
+            <span class="keyword">self</span>.tail = <span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(&amp;node_rc));
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="keyword">let</span> <span class="variable">node_prev</span>;
+            <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> head_val) = <span class="keyword">self</span>.head &#123;
+                <span class="comment">// 读取旧头节点并增加其Rc</span>
+                node_prev = Rc::<span class="title function_ invoke__">clone</span>(head_val);
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="built_in">panic!</span>()
+            &#125;
+            <span class="comment">// 构建节点</span>
+            <span class="keyword">let</span> <span class="variable">node</span> = Node &#123;
+                value,
+                prev: Cell::<span class="title function_ invoke__">new</span>(<span class="literal">None</span>),
+                <span class="comment">// 设置后缀节点</span>
+                next: Cell::<span class="title function_ invoke__">new</span>(<span class="title function_ invoke__">Some</span>(node_prev)),
+            &#125;;
+            <span class="keyword">let</span> <span class="variable">node_rc</span> = Rc::<span class="title function_ invoke__">new</span>(<span class="type">Box</span>::<span class="title function_ invoke__">new</span>(node));
+            <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> head_val) = <span class="keyword">self</span>.head &#123;
+                <span class="comment">// 设置旧头节点的前驱节点</span>
+                head_val.prev.<span class="title function_ invoke__">set</span>(<span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(&amp;node_rc)));
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="built_in">panic!</span>()
+            &#125;
+            <span class="comment">// 更新头节点为新的节点</span>
+            <span class="keyword">self</span>.head = <span class="title function_ invoke__">Some</span>(node_rc);
+        &#125;
+        <span class="keyword">self</span>.size += <span class="number">1</span>;
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">pop_back</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;T&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="literal">None</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="keyword">self</span>.size -= <span class="number">1</span>;
+            <span class="keyword">let</span> <span class="variable">ans</span>;
+            <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> tail_val) = <span class="keyword">self</span>.tail &#123;
+                ans = <span class="title function_ invoke__">Some</span>(tail_val.value.<span class="title function_ invoke__">clone</span>());
+                <span class="comment">// 先取出来，临时保存</span>
+                <span class="keyword">let</span> <span class="variable">tail_prev</span> = tail_val.prev.<span class="title function_ invoke__">take</span>();
+                <span class="comment">// 中断旧尾节点的前驱节点</span>
+                tail_val.prev.<span class="title function_ invoke__">set</span>(<span class="literal">None</span>);
+                <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> tail_prev_val) = tail_prev &#123;
+                    <span class="comment">// 如果前面还有节点，更新它的next</span>
+                    tail_prev_val.next.<span class="title function_ invoke__">set</span>(<span class="literal">None</span>);
+                    <span class="keyword">self</span>.tail = <span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(tail_prev_val));
+                &#125; <span class="keyword">else</span> &#123;
+                    <span class="keyword">self</span>.tail = <span class="literal">None</span>;
+                &#125;
+                ans
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="built_in">panic!</span>()
+            &#125;
+        &#125;
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">pop_front</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;T&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="literal">None</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="keyword">self</span>.size -= <span class="number">1</span>;
+            <span class="keyword">let</span> <span class="variable">ans</span>;
+            <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> head_val) = <span class="keyword">self</span>.head &#123;
+                ans = <span class="title function_ invoke__">Some</span>(head_val.value.<span class="title function_ invoke__">clone</span>());
+                <span class="keyword">let</span> <span class="variable">head_next</span> = head_val.next.<span class="title function_ invoke__">take</span>();
+                <span class="comment">// 中断旧头节点的后缀节点</span>
+                head_val.next.<span class="title function_ invoke__">set</span>(<span class="literal">None</span>);
+                <span class="keyword">if</span> <span class="keyword">let</span> <span class="variable">Some</span>(<span class="keyword">ref</span> head_next_val) = head_next &#123;
+                    <span class="comment">// 如果后面还有节点，prev</span>
+                    head_next_val.prev.<span class="title function_ invoke__">set</span>(<span class="literal">None</span>);
+                    <span class="keyword">self</span>.head = <span class="title function_ invoke__">Some</span>(Rc::<span class="title function_ invoke__">clone</span>(head_next_val));
+                &#125; <span class="keyword">else</span> &#123;
+                    <span class="keyword">self</span>.head = <span class="literal">None</span>;
+                &#125;
+                ans
+            &#125; <span class="keyword">else</span> &#123;
+                <span class="built_in">panic!</span>()
+            &#125;
+        &#125;
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">peek_back</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;T&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="literal">None</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="title function_ invoke__">Some</span>(<span class="keyword">self</span>.tail.<span class="title function_ invoke__">as_ref</span>().<span class="title function_ invoke__">unwrap</span>().value.<span class="title function_ invoke__">clone</span>())
+        &#125;
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">peek_front</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;T&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="literal">None</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="title function_ invoke__">Some</span>(<span class="keyword">self</span>.head.<span class="title function_ invoke__">as_ref</span>().<span class="title function_ invoke__">unwrap</span>().value.<span class="title function_ invoke__">clone</span>())
+        &#125;
+    &#125;
+
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">peek_back_ref</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;&amp;T&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="literal">None</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="title function_ invoke__">Some</span>(&amp;<span class="keyword">self</span>.tail.<span class="title function_ invoke__">as_ref</span>().<span class="title function_ invoke__">unwrap</span>().value)
+        &#125;
+    &#125;
+
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">peek_front_ref</span>(&amp;<span class="keyword">mut</span> <span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">Option</span>&lt;&amp;T&gt; &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="literal">None</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="title function_ invoke__">Some</span>(&amp;<span class="keyword">self</span>.head.<span class="title function_ invoke__">as_ref</span>().<span class="title function_ invoke__">unwrap</span>().value)
+        &#125;
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">size</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">usize</span> &#123;
+        <span class="keyword">self</span>.size
+    &#125;
+    
+    <span class="keyword">pub</span> <span class="keyword">fn</span> <span class="title function_">is_empty</span>(&amp;<span class="keyword">self</span>) <span class="punctuation">-&gt;</span> <span class="type">bool</span> &#123;
+        <span class="keyword">if</span> <span class="keyword">self</span>.size == <span class="number">0</span> &#123;
+            <span class="literal">true</span>
+        &#125; <span class="keyword">else</span> &#123;
+            <span class="literal">false</span>
+        &#125;
+    &#125;
+&#125;
+
+<span class="meta">#[cfg(test)]</span>
+<span class="keyword">mod</span> tests &#123;
+    <span class="keyword">use</span> crate::list::List;
+
+    <span class="meta">#[test]</span>
+    <span class="keyword">fn</span> <span class="title function_">test</span>() &#123;
+        <span class="keyword">let</span> <span class="keyword">mut </span><span class="variable">list</span> = List::<span class="title function_ invoke__">new</span>();
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">1</span>.<span class="title function_ invoke__">to_string</span>());
+        list.<span class="title function_ invoke__">push_back</span>(<span class="number">2</span>.<span class="title function_ invoke__">to_string</span>());
+        list.<span class="title function_ invoke__">push_back</span>(<span class="number">3</span>.<span class="title function_ invoke__">to_string</span>());
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">pop_front</span>().<span class="title function_ invoke__">unwrap</span>());
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">pop_front</span>().<span class="title function_ invoke__">unwrap</span>());
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">4</span>.<span class="title function_ invoke__">to_string</span>());
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">5</span>.<span class="title function_ invoke__">to_string</span>());
+        list.<span class="title function_ invoke__">push_back</span>(<span class="number">6</span>.<span class="title function_ invoke__">to_string</span>());
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">pop_front</span>().<span class="title function_ invoke__">unwrap</span>());
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">7</span>.<span class="title function_ invoke__">to_string</span>());
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">8</span>.<span class="title function_ invoke__">to_string</span>());
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">pop_back</span>().<span class="title function_ invoke__">unwrap</span>());
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">pop_front</span>().<span class="title function_ invoke__">unwrap</span>());
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">9</span>.<span class="title function_ invoke__">to_string</span>());
+        list.<span class="title function_ invoke__">push_front</span>(<span class="number">10</span>.<span class="title function_ invoke__">to_string</span>());
+        <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">peek_front_ref</span>().<span class="title function_ invoke__">unwrap</span>());
+        <span class="keyword">while</span> !list.<span class="title function_ invoke__">is_empty</span>() &#123;
+            <span class="built_in">println!</span>(<span class="string">&quot;&#123;&#125;&quot;</span>, list.<span class="title function_ invoke__">pop_front</span>().<span class="title function_ invoke__">unwrap</span>());
+        &#125;
+    &#125;
+&#125;</code></pre>
+
+
+  <p><a class="classtest-link" href="/tags/Rust/" rel="tag">Rust</a>, <a class="classtest-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a> — Jan 8, 2024</p>
+  
+
+
+        </div>
+        <div class="row mt-2">
+  <h3>Search</h3>
+  <div><input id="search-text" title="search" class="search-text" type="text" placeholder="search......"></div>
+  <div style="margin-top: 1.5rem;">
+    <ul id="result"></ul>
+  </div>
+</div>
+        <div class="row mt-2">
+  
+    <div class="eight columns">
+      <p id="madewith">Made with ❤ and
+        <a class="footer-link icon" href="https://hexo.io" target="_blank" style="text-decoration: none;" rel="noreferrer" aria-label="Hexo.io">
+        <svg class="hexo svg-hov" width="14" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><title>Hexo.js</title><path d="M12 .007L1.57 6.056V18.05L12 23.995l10.43-6.049V5.952L12 .007zm4.798 17.105l-.939.521-.939-.521V12.94H9.08v4.172l-.94.521-.938-.521V6.89l.939-.521.939.521v4.172h5.84V6.89l.94-.521.938.521v10.222z"/></svg>
+        </a>
+        
+        at <a href="https://en.wikipedia.org/wiki/Earth" target="_blank" rel="noreferrer">Earth</a>.</p>
+        
+    </div>
+
+    <!-- Sepcial thanks to https://simpleicons.org/ for the icons -->
+    <div class="four columns mb-3 posisi" >
+      
+      <a class="ml-0 footer-link icon" href="https://github.com/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="GitHub">
+        <svg class="github svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>GitHub</title><path d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://linkedin.com/in/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="LinkedIn">
+        <svg class="linkedin svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>LinkedIn</title><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://twitter.com/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="Twitter">
+        <svg class="twitter svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Twitter</title><path d="M23.954 4.569c-.885.389-1.83.654-2.825.775 1.014-.611 1.794-1.574 2.163-2.723-.951.555-2.005.959-3.127 1.184-.896-.959-2.173-1.559-3.591-1.559-2.717 0-4.92 2.203-4.92 4.917 0 .39.045.765.127 1.124C7.691 8.094 4.066 6.13 1.64 3.161c-.427.722-.666 1.561-.666 2.475 0 1.71.87 3.213 2.188 4.096-.807-.026-1.566-.248-2.228-.616v.061c0 2.385 1.693 4.374 3.946 4.827-.413.111-.849.171-1.296.171-.314 0-.615-.03-.916-.086.631 1.953 2.445 3.377 4.604 3.417-1.68 1.319-3.809 2.105-6.102 2.105-.39 0-.779-.023-1.17-.067 2.189 1.394 4.768 2.209 7.557 2.209 9.054 0 13.999-7.496 13.999-13.986 0-.209 0-.42-.015-.63.961-.689 1.8-1.56 2.46-2.548l-.047-.02z"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://instagram.com/adisaktijrs" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="Instagram">
+        <svg class="instagram svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Instagram</title><path d="M12 0C8.74 0 8.333.015 7.053.072 5.775.132 4.905.333 4.14.63c-.789.306-1.459.717-2.126 1.384S.935 3.35.63 4.14C.333 4.905.131 5.775.072 7.053.012 8.333 0 8.74 0 12s.015 3.667.072 4.947c.06 1.277.261 2.148.558 2.913.306.788.717 1.459 1.384 2.126.667.666 1.336 1.079 2.126 1.384.766.296 1.636.499 2.913.558C8.333 23.988 8.74 24 12 24s3.667-.015 4.947-.072c1.277-.06 2.148-.262 2.913-.558.788-.306 1.459-.718 2.126-1.384.666-.667 1.079-1.335 1.384-2.126.296-.765.499-1.636.558-2.913.06-1.28.072-1.687.072-4.947s-.015-3.667-.072-4.947c-.06-1.277-.262-2.149-.558-2.913-.306-.789-.718-1.459-1.384-2.126C21.319 1.347 20.651.935 19.86.63c-.765-.297-1.636-.499-2.913-.558C15.667.012 15.26 0 12 0zm0 2.16c3.203 0 3.585.016 4.85.071 1.17.055 1.805.249 2.227.415.562.217.96.477 1.382.896.419.42.679.819.896 1.381.164.422.36 1.057.413 2.227.057 1.266.07 1.646.07 4.85s-.015 3.585-.074 4.85c-.061 1.17-.256 1.805-.421 2.227-.224.562-.479.96-.899 1.382-.419.419-.824.679-1.38.896-.42.164-1.065.36-2.235.413-1.274.057-1.649.07-4.859.07-3.211 0-3.586-.015-4.859-.074-1.171-.061-1.816-.256-2.236-.421-.569-.224-.96-.479-1.379-.899-.421-.419-.69-.824-.9-1.38-.165-.42-.359-1.065-.42-2.235-.045-1.26-.061-1.649-.061-4.844 0-3.196.016-3.586.061-4.861.061-1.17.255-1.814.42-2.234.21-.57.479-.96.9-1.381.419-.419.81-.689 1.379-.898.42-.166 1.051-.361 2.221-.421 1.275-.045 1.65-.06 4.859-.06l.045.03zm0 3.678c-3.405 0-6.162 2.76-6.162 6.162 0 3.405 2.76 6.162 6.162 6.162 3.405 0 6.162-2.76 6.162-6.162 0-3.405-2.76-6.162-6.162-6.162zM12 16c-2.21 0-4-1.79-4-4s1.79-4 4-4 4 1.79 4 4-1.79 4-4 4zm7.846-10.405c0 .795-.646 1.44-1.44 1.44-.795 0-1.44-.646-1.44-1.44 0-.794.646-1.439 1.44-1.439.793-.001 1.44.645 1.44 1.439z"/></svg>
+      </a>
+      
+
+      
+      <a class="ml-0 footer-link icon" href="https://stackoverflow.com/story/tobiasreithmeier" target="_blank" style="text-decoration: none" rel="noreferrer" aria-label="StackOverflow">
+        <svg class="stackoverflow svg-hov" width="18" role="img" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><title>Stack Overflow</title><path d="M15.725 0l-1.72 1.277 6.39 8.588 1.716-1.277L15.725 0zm-3.94 3.418l-1.369 1.644 8.225 6.85 1.369-1.644-8.225-6.85zm-3.15 4.465l-.905 1.94 9.702 4.517.904-1.94-9.701-4.517zm-1.85 4.86l-.44 2.093 10.473 2.201.44-2.092-10.473-2.203zM1.89 15.47V24h19.19v-8.53h-2.133v6.397H4.021v-6.396H1.89zm4.265 2.133v2.13h10.66v-2.13H6.154Z"/></svg>
+      </a>
+      
+
+    </div>
+  
+</div>
+
+      </div>
+
+    </div>
+
+  </div>
+  <script src="/js/nanobar.min.js"></script>
+
+  <script>
+    var options = {
+      classname: 'nanobar',
+      id: 'myNanobar'
+    };
+    var nanobar = new Nanobar(options);
+    nanobar.go(30);
+    nanobar.go(76);
+    nanobar.go(100);
+  </script>
+
+</body>
+
+</html>

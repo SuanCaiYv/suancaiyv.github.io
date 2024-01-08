@@ -1,0 +1,7 @@
+http://example.com/Work/index.html
+http://example.com/About/index.html
+http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/
+http://example.com/Rust%E7%AC%94%E8%AE%B0/index.html
+http://example.com/
+http://example.com/tags/Rust/
+http://example.com/tags/%E7%AC%94%E8%AE%B0/
