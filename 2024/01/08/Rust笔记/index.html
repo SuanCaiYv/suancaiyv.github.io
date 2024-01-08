@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
 
@@ -13,24 +13,24 @@
   
   <title>Rust笔记</title>
   
-  <link rel="sitemap" href="http://example.comsitemap.xml,sitemap.txt" />
+  <link rel="sitemap" href="https://suancaiyv.github.io/projectsitemap.xml,sitemap.txt" />
   
-  <link rel="canonical" href="http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/">
+  <link rel="canonical" href="https://suancaiyv.github.io/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/">
   
   <meta name="description" content="基础写在最前面因为Rust比较难，所以一些概念我也是绕了很久，尤其是一些比较深入的概念，我则是查阅了很多资料最后给出一个合理的解释，所以文章有不少XXXX年-XX月-XX日追加这样的描述，如果追加内容和原文有冲突，请以追加为准，追加之间有冲突，请以最新的追加为准。当然了，一般而言都是没有冲突的，我也">
   
   
-  <meta name="author" content="John Doe">
+  <meta name="author" content="CodeWithBuff">
   
   
   
-  <meta property="og:site_name" content="Hexo" />
+  <meta property="og:site_name" content="CodeWithBuff" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Rust笔记" />
   
   <meta property="og:description" content="基础写在最前面因为Rust比较难，所以一些概念我也是绕了很久，尤其是一些比较深入的概念，我则是查阅了很多资料最后给出一个合理的解释，所以文章有不少XXXX年-XX月-XX日追加这样的描述，如果追加内容和原文有冲突，请以追加为准，追加之间有冲突，请以最新的追加为准。当然了，一般而言都是没有冲突的，我也">
   
-  <meta property="og:url" content="http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/" />
+  <meta property="og:url" content="https://suancaiyv.github.io/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/" />
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Rust笔记">
@@ -40,7 +40,7 @@
   
   
   
-  <meta name="twitter:url" content="http://example.com/2024/01/08/Rust%E7%AC%94%E8%AE%B0/" />
+  <meta name="twitter:url" content="https://suancaiyv.github.io/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/" />
 
   <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -54,24 +54,24 @@
   <!-- CSS
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   
-<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/project/css/normalize.css">
 
   
-<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/project/css/skeleton.css">
 
   
-<link rel="stylesheet" href="/css/custom.css">
+<link rel="stylesheet" href="/project/css/custom.css">
 
   
-<link rel="stylesheet" href="/css/prism-dark.css">
+<link rel="stylesheet" href="/project/css/prism-dark.css">
 
   
-<link rel="stylesheet" href="/css/prism-line-numbers.css">
+<link rel="stylesheet" href="/project/css/prism-line-numbers.css">
 
   <!-- User css -->
   
   
-<link rel="stylesheet" href="/css/user.css">
+<link rel="stylesheet" href="/project/css/user.css">
 
   
 
@@ -175,14 +175,14 @@
   <div class="twelve columns">
     <div class="row">
       <div class="nine columns left">
-        <a href="/">Home</a>
+        <a href="/project/">Home</a>
         
           
-          <a href="/Works" class="ml">Works</a>
+          <a href="/project/Works" class="ml">Works</a>
           
         
           
-          <a href="/About" class="ml">About</a>
+          <a href="/project/About" class="ml">About</a>
           
         
         
@@ -346,7 +346,7 @@
 <p>所以准确来说Rust保证变量在被使用时一定的合法的，而某一个内存区域则不然，因为没有变量引用的内存区域(即没有所有权的内存区域)是需要回收的。</p>
 <p>这也就可以解释为什么可以通过解引用可变引用进行重新赋值和内部更新，因为这依旧满足了变量的合法性，而不是内存的合法性。</p>
 <p>来一个引用，解引用和值，变量，类型，对象的概念：</p>
-<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/type_variable_value_ref_deref_object.svg"></p>
+<p><img src="/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/type_variable_value_ref_deref_object.svg"></p>
 <p>来看文字描述：</p>
 <ul>
 <li>值：一组bit组成的集合</li>
@@ -919,7 +919,7 @@
 <p>假如我有一个需求，想要保证父变量不可变，而子变量可变，该怎么实现呢？你是不是觉得我在虚构一个不存在的场景？其实这是很常见的，比如函数参数传递只希望更新某一字段，而不希望接收方无意更改其他字段。那么该怎么实现这样的功能呢？</p>
 <p>答案就是<strong>内部可变性</strong>，说白了，通过<strong>设置结构体某一字段所处的内存空间为可变的，而后跳过结构体直接对该空间进行读写</strong>，进而实现所需的功能。内部可变性一般是由编译器来实现，手动实现比较复杂且涉及到unsafe，好在，Rust提供了Cell和RefCell来帮助我们。</p>
 <p>来看一张图：</p>
-<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/refcell_cell.svg"></p>
+<p><img src="/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/refcell_cell.svg"></p>
 <p>当然了，实际的实现可能没这么粗糙，这里只是简单示意一下可能的实现。</p>
 <p>那么问题来了，Cell和RefCell的区别在哪？我认为区别只有一个：<strong>Cell直接更新内存空间，RefCell通过得到引用，而后解引用去更新内存空间</strong>。可见后者多了一个取地址和解引用的过程，正是因为不是所有时候都需要转移所有权，所以Rust也提供了借助引用访问这块可更新内存区域的方式，即RefCell。同时RefCell也通过运行时进行借用规则检查，确保满足借用之间不冲突。</p>
 <p>说白了<strong>RefCell只是Cell的引用形式，就和普通变量和它的引用一样的关系</strong>。如下所示：</p>
@@ -994,7 +994,7 @@
 <p>当然是可以，这种实现称为乱序执行，即打乱指令的执行顺序，尽可能保证执行车间一直是满载状态。但是前提是不存在数据依赖和指令跳转。原因很好理解，数据依赖导致执行顺序无法乱序，跳转则是涉及到全新的执行流，需要清空流水线。</p>
 <p>想象一下，一段代码中，只有通过常量对两个变量的赋值操作，那么他们不依赖任何数据，所以可以使用乱序执行，第一条赋值结束立马跟上第二条，让赋值执行单元满载，而不用等到第一条赋值完并且写入寄存器文件再执行下一条。</p>
 <p>此外，这样的执行方式还可能重排顺序，比如两个整型操作和一个浮点操作穿插，则可以合并两个整型操作，或者两个常量赋值操作可能会被合并到一个变量赋值操作之前。</p>
-<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/5E374DAC-C381-4973-A31C-E392FCE52D3B_1_105_c.png" alt="5E374DAC-C381-4973-A31C-E392FCE52D3B_1_105_c"></p>
+<p><img src="/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/5E374DAC-C381-4973-A31C-E392FCE52D3B_1_105_c.png" alt="5E374DAC-C381-4973-A31C-E392FCE52D3B_1_105_c"></p>
 <p>现在可以看到指令重排序在CPU层级的原因了。当然还有编译器级别的实现，这里不再展开赘述。</p>
 <p>在一个单CPU程序中，则有变量访问于读写顺序，等同于书写顺序，因为即使存在重排序，但是它们都依赖同一CPU缓存，所以可见性的先后顺序不会发生改变，同时CPU在重排序时也不会重排有数据依赖的指令。但是在多CPU程序中，则无法通过当前CPU限制另一CPU对于指令重排的情况，所以可能会读到重排后的结果，而影响自身的执行结果。</p>
 <p>一个很常见的情况就是线程A依赖变量flag为真，而后使用值value，其中flag由假变为真发生在线程B中，且发生在value赋值之后，但是二者顺序可能因为前面的bool操作而追求流水线满载，进而把flag重排在value赋值之前，毕竟对于B来说，重排二者没什么影响。但是对A影响就大了。</p>
@@ -1040,12 +1040,12 @@
 &#125;</code></pre>
 
 <h3 id="异步编程"><a href="#异步编程" class="headerlink" title="异步编程"></a>异步编程</h3><p>首先先来看一个整体架构图：</p>
-<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/async_await.svg"></p>
+<p><img src="/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/async_await.svg"></p>
 <p>Rust对于异步的支持，仅限提供了一个标准，而实际对于异步函数的执行，则是由第三方运行时去实现。怎么理解呢？</p>
 <p>首先，Rust对于异步这一块，提供了两个关键字：<code>async</code>和<code>await</code>。Rust的异步执行逻辑则是<strong>延迟执行</strong>。当我们使用a<strong>sync去修饰函数，代码块</strong>时，会得到一个由编译器生成的<strong>实现了Future特征的匿名结构体</strong>。而Future特征就是异步任务被执行的关键。</p>
 <p>对于异步任务的触发，则是需要在异步方法后调用await关键字，触发对于Future状态的推进；当前Future的执行由外层Future负责(隐式说明await只能在异步中调用)，而<strong>最外层的Future的触发，则是运行时处理</strong>，在这里选择Tokio。</p>
 <p>来看一个图：</p>
-<p><img src="/2024/01/08/Rust%E7%AC%94%E8%AE%B0/tokio_runtime.svg"></p>
+<p><img src="/project/2024/01/08/Rust%E7%AC%94%E8%AE%B0/tokio_runtime.svg"></p>
 <p>上图的由await推进可能有点不准确，准确来说应该是await+tokio推进，await会尝试把Future通过Tokio的方法包装成Task并递交到Tokio的任务队列中，设置唤醒器等操作。</p>
 <h3 id="更多"><a href="#更多" class="headerlink" title="更多"></a>更多</h3><p>其实到这里，基本就结束了，Rust的语法已经没了，而且编程本身就是实践出真理，建议大家直接移步项目部分，看一些项目实战。在这里我选择直接学习Hyper的使用和actix-web，并选择后者去构建一个小的CRUD后端服务。</p>
 <p>关于Tokio这里选择埋坑，因为Tokio的实现，对于Future的调度策略这里都没有提及，后续等使用结束会重新回填这个坑。</p>
@@ -1277,7 +1277,7 @@
 &#125;</code></pre>
 
 
-  <p><a class="classtest-link" href="/tags/Rust/" rel="tag">Rust</a>, <a class="classtest-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a> — Jan 8, 2024</p>
+  <p><a class="classtest-link" href="/project/tags/Rust/" rel="tag">Rust</a>, <a class="classtest-link" href="/project/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a> — 2024年1月8日</p>
   
 
 

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 
 <head>
 
@@ -13,24 +13,24 @@
   
   <title>Go笔记</title>
   
-  <link rel="sitemap" href="http://example.comsitemap.xml,sitemap.txt" />
+  <link rel="sitemap" href="https://suancaiyv.github.io/projectsitemap.xml,sitemap.txt" />
   
-  <link rel="canonical" href="http://example.com/2024/01/08/Go%E7%AC%94%E8%AE%B0/">
+  <link rel="canonical" href="https://suancaiyv.github.io/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/">
   
   <meta name="description" content="slice及其衍生Go的数组和早期的C&amp;#x2F;Rust一样，大小都是编译期确定的，即a :&amp;#x3D; [n]int是不可行的，数组长度必须为常量。此外，数组长度是数组类型的一部分，不同于Java等语言，数组类型仅仅是元素类型[]，Go的数组类型 &amp;#x3D; 元素类型[] + 数组长度。 也正">
   
   
-  <meta name="author" content="John Doe">
+  <meta name="author" content="CodeWithBuff">
   
   
   
-  <meta property="og:site_name" content="Hexo" />
+  <meta property="og:site_name" content="CodeWithBuff" />
   <meta property="og:type" content="article" />
   <meta property="og:title" content="Go笔记" />
   
   <meta property="og:description" content="slice及其衍生Go的数组和早期的C&amp;#x2F;Rust一样，大小都是编译期确定的，即a :&amp;#x3D; [n]int是不可行的，数组长度必须为常量。此外，数组长度是数组类型的一部分，不同于Java等语言，数组类型仅仅是元素类型[]，Go的数组类型 &amp;#x3D; 元素类型[] + 数组长度。 也正">
   
-  <meta property="og:url" content="http://example.com/2024/01/08/Go%E7%AC%94%E8%AE%B0/" />
+  <meta property="og:url" content="https://suancaiyv.github.io/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/" />
 
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="Go笔记">
@@ -40,7 +40,7 @@
   
   
   
-  <meta name="twitter:url" content="http://example.com/2024/01/08/Go%E7%AC%94%E8%AE%B0/" />
+  <meta name="twitter:url" content="https://suancaiyv.github.io/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/" />
 
   <!-- Mobile Specific Metas
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
@@ -54,24 +54,24 @@
   <!-- CSS
   –––––––––––––––––––––––––––––––––––––––––––––––––– -->
   
-<link rel="stylesheet" href="/css/normalize.css">
+<link rel="stylesheet" href="/project/css/normalize.css">
 
   
-<link rel="stylesheet" href="/css/skeleton.css">
+<link rel="stylesheet" href="/project/css/skeleton.css">
 
   
-<link rel="stylesheet" href="/css/custom.css">
+<link rel="stylesheet" href="/project/css/custom.css">
 
   
-<link rel="stylesheet" href="/css/prism-dark.css">
+<link rel="stylesheet" href="/project/css/prism-dark.css">
 
   
-<link rel="stylesheet" href="/css/prism-line-numbers.css">
+<link rel="stylesheet" href="/project/css/prism-line-numbers.css">
 
   <!-- User css -->
   
   
-<link rel="stylesheet" href="/css/user.css">
+<link rel="stylesheet" href="/project/css/user.css">
 
   
 
@@ -175,14 +175,14 @@
   <div class="twelve columns">
     <div class="row">
       <div class="nine columns left">
-        <a href="/">Home</a>
+        <a href="/project/">Home</a>
         
           
-          <a href="/Works" class="ml">Works</a>
+          <a href="/project/Works" class="ml">Works</a>
           
         
           
-          <a href="/About" class="ml">About</a>
+          <a href="/project/About" class="ml">About</a>
           
         
         
@@ -229,7 +229,7 @@
 <p>字符串底层是[]byte，所以可以直接通过str[idx]进行访问，此外，也可以强制类型转换成[]byte，如果通过for range遍历，则会得到码点，此时便利则变成了一个[]rune类型的数组的遍历，rune本质是一个int32类型。</p>
 <p>字符串支持Slice的切片操作，此时会生成新的字符串并拷贝数据。</p>
 <h2 id="unsafe"><a href="#unsafe" class="headerlink" title="unsafe"></a>unsafe</h2><p>Go保留了指针，但是却给予其一定的限制。所以有时候我们想像C语言那样实现对内存地址的完全访问和控制，就需要unsafe来帮我们。</p>
-<p>Unsafe包下最关键的两个类型则是Pointer和uintptr，这两个类型加上普通类型的指针类型，三者有着以下的关系：<img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/go_unsafe.svg" alt="go_unsafe"></p>
+<p>Unsafe包下最关键的两个类型则是Pointer和uintptr，这两个类型加上普通类型的指针类型，三者有着以下的关系：<img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/go_unsafe.svg" alt="go_unsafe"></p>
 <p>可以看到，Pointer作为一个中介存在。它可以把任意类型的指针类型转换成可用于数学运算的纯数字类型uintptr，uintptr像是一个int型指针的别名，Pointer是*int的别名，对，是一个int指针的别名。</p>
 <p>在这里我详细说一下uintptr：官方注释写到：uintptr类型的值大到足够容纳任何类型的指针的值，所以可以看成一个C语言中的void*类型，个人理解。但是无论什么类型的指针，本质都是一个地址，地址全部是数字类型的，或者说，整型的，所以uintptr代表的就是这个“整型”类型，也可以说“内存地址”类型，而内存地址是支持数学运算的。</p>
 <p>现在来看看uintptr和Pointer的区别：</p>
@@ -264,7 +264,7 @@
 &#125;</code></pre>
 
 <p>在理解这个例子之前，我们先看看Go结构体布局。Go称为互联网时代的C语言，很大部分原因是因为它和C很像，结构体布局亦是如此：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/go_struct_memory.svg"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/go_struct_memory.svg"></p>
 <p>对齐遵循一个原则：<strong>在不浪费空间的情况下减少依次读取结构体所有字段的访问次数，同时对于某一字段，其起始地址必须是字段对应类型大小的N倍</strong>。</p>
 <p>这里说一下空结构体，空结构体本身不占内存，所以在最前面时不占空间，但是如果空结构体在结构体最后，同时此时没有触发内存对齐，就会<strong>触发编译器的强制对齐，目的是防止访问到下一个内存区域</strong>。</p>
 <p>所以结构体对象可以通过<strong>合理排列字段，来实现更好地内存利用</strong>。</p>
@@ -307,7 +307,7 @@
 <li>sync.Once也可以实现，Once参数的调用(它的参数是个函数)早于所有对于Once.do()的调用完成(即Once.do()返回)。</li>
 </ul>
 <p>关于channel，看一张图：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/go_chan.svg" alt="go_chan"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/go_chan.svg" alt="go_chan"></p>
 <p>现在来看看Go可能的同步使用方法。</p>
 <p>最常用的就是chan。chan的灵活使用和Go强调的基于管道通信，CSP技术有着莫大的关系。除了简单的通过chan来实现happen-before以此来控制多Go程执行顺序之外，还有以下用法：</p>
 <ul>
@@ -369,7 +369,7 @@
 <h2 id="汇编"><a href="#汇编" class="headerlink" title="汇编"></a>汇编</h2><p>Go的汇编不是C的汇编，C语言的汇编是强绑定于机器和编译器的。Go的汇编是<strong>基于Plan 9汇编改编的，且抽象了部分指令和架构，使之更加通用的Go汇编</strong>。但是我们可以在Go汇编中看到熟悉的影子。</p>
 <p>Plan 9汇编不是我们重点关注的内容，感兴趣的读者可以去看看。我们这里更多是基于X64架构讲解Go的汇编。为什么是X64呢？因为服务器基本是X64架构的。</p>
 <p>在正式讲解之前，我希望读者拥有部分计算机组成原理的基础。比如了解X64架构的基本执行原理。我们先来看一张图：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/x64_arch.svg"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/x64_arch.svg"></p>
 <p>X64是典型的callee saved模式，即被调用者负责保存调用者的寄存器，调用者在自己的栈帧里设置参数和返回地址(CALL指令下条指令的地址，不是返回值地址)。返回值一般通过RAX寄存器保存。</p>
 <p>当发生函数调用时：</p>
 <ul>
@@ -395,7 +395,7 @@
 <li>FP：这依旧是一个伪寄存器，指向调用者的栈帧区域，用来方便被调用者查找参数和写入返回值。</li>
 </ul>
 <p>除去这四个伪寄存器，Golang的其他栈帧结构和X64是很像的：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/x64_golang_arch.svg"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/x64_golang_arch.svg"></p>
 <p>区分伪SP和真SP的方法很简单：就是真SP没有任何前缀，伪SP寄存器有一个符号作为前缀。</p>
 <p>对于一个函数，我们可以通过汇编定义，然后在普通Go文件调用，既不需要导出，也不需要其他什么操作，Go编译器会帮我们完成这一切。这里需要注意一点，就是汇编不可以和CGO一起使用，否则会出现符号解析错误，因为CGO会把.s文件当成C的汇编来处理。</p>
 <p>对于一个全局变量，我们也可以指定变量名，变量大小，然后初始化它，但是没法指明它的类型，类型不存在于Golang汇编中。</p>
@@ -531,7 +531,7 @@
 </li>
 </ul>
 <p>我们可以看到，两个核心方法的入参都是interface{}类型，当我们调用时，编译器会自动做类型转换，所以我们有了下面的对应关系：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/reflect.svg"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/reflect.svg"></p>
 <p>这里interface{}会被处理得到emptyInterface的结构体，这个结构体和上面的iface一模一样，那到这里，一切就清晰了。</p>
 <p>emptyInterface里面的数据指针则是Value的值来源，*rtype则是Type的值来源，此时我们清楚地得到了类型结构体和值指针，想要获取一些就是直接读取和解析的事儿。</p>
 <p>以结构体为例，结构体方法是有序存放在结构体类型后面的，偏移量亦是固定的，想要访问方法列表，需要把emptyInterface转换成structTypeUncommon，然后读取相关的方法偏移量找到方法列表，以及方法个数等。</p>
@@ -675,7 +675,7 @@ chosen, revcOK := selectgo(selv, order, N)
 <p>这里<strong>无论是chansend&#x2F;chanrecv，还是selectgo，对于不满足条件的goroutine的处理都是加入chan的阻塞队列并挂起或出队唤醒</strong>，所以chan的阻塞队列成为了连同这两个chan使用方式的桥梁。</p>
 <p>到这里我们基本解开了select和chan的面纱，发现它们其实没有多么复杂，就是通过阻塞队列和字段锁来实现的，<strong>它更像是一个小型的，精巧的阻塞队列，只是一个线程可以阻塞在多个队列上，然后任由其中之一唤醒，进而轮训所有队列得到唤醒自己的那个</strong>。这样来理解可能会简单一些。</p>
 <p>最后来看看上述各结构体之间的关系：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/select_chan.svg"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/select_chan.svg"></p>
 <h2 id="defer-panic-recovery-make-new"><a href="#defer-panic-recovery-make-new" class="headerlink" title="defer &amp; panic&#x2F;recovery; make &amp; new"></a>defer &amp; panic&#x2F;recovery; make &amp; new</h2><p>回首思考Go的一些语言特性，我们想到了标题的这些关键词，现在来好好看看它们的实现，并借此加深对它们的理解。</p>
 <p>首先是defer，它是延迟函数，单纯就使用上来说，它实现了defer定义的函数<strong>在“真正的”return之前，当前函数所有语句之后</strong>执行。很适合用于关闭资源，锁释放等操作。</p>
 <p>这里需要提一下什么是所谓的<strong>真正的return</strong> ？Go对于返回值定义了两种返回方式：裸返回和命名返回。</p>
@@ -894,7 +894,7 @@ chosen, revcOK := selectgo(selv, order, N)
 &#125;</code></pre>
 
 <p>在我们正式展开之前，我们来看看定时器的状态以及转换关系：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/timer_status.svg"><br>Cancel changes<br>除了上述的状态，对于ing的状态，比如Runing，Modifying，Moving，可能会被要求让出CPU供其他goroutine使用(如果此时另一个goroutine正在更新状态的话)。</p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/timer_status.svg"><br>Cancel changes<br>除了上述的状态，对于ing的状态，比如Runing，Modifying，Moving，可能会被要求让出CPU供其他goroutine使用(如果此时另一个goroutine正在更新状态的话)。</p>
 <p>定时器的核心方法有六个，它们共同协作，切换状态，唤醒NetPoll，重排任务… …</p>
 <pre><code class="highlight go"><span class="comment">// 添加定时器</span>
 <span class="function"><span class="keyword">func</span> <span class="title">addtimer</span><span class="params">(t *timer)</span></span>
@@ -1222,7 +1222,7 @@ chosen, revcOK := selectgo(selv, order, N)
 </ul>
 <p>这里先来介绍所谓的“size class”，它会决定每一个小对象到底分配到哪个mspan。Go针对32KB以下的对象大小，划分出了67+1种分组方法，每个对象需要放到最接近它的size class对应的mspan中，比如0-8B放入到8B的size class，8-16B放入到16B的size class。以此类推，此外还定义了size class 0，表示大对象，它们没有对应的mspan，它们会被直接分配到堆。</p>
 <p>通过一张表来看看对象大小可以映射到的size class关系，以及size class对应的mspan：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/size_class.webp"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/size_class.webp"></p>
 <ul>
 <li>class：size class的编号</li>
 <li>bytes&#x2F;object：此mspan可以接受的最大对象的大小</li>
@@ -1315,7 +1315,7 @@ chosen, revcOK := selectgo(selv, order, N)
 <p>当mcentral的空间也不足时，会去mheap申请新的空间，这里包括去已经存在的heapArena寻找空间以及在所有的arena都没有空间时触发一次操作系统内存分配，然后把获取到的mspan(这里返回的依旧是mspan，而不是页，不然前面也不会说它是内存管理的基本单元了)返回给调用方。</p>
 <p>当mspan尝试从mcentral分配空间时，获取顺序是：清理过的partial &#x3D;&gt; 未清理过的partial &#x3D;&gt; 未清理过的full &#x3D;&gt; grow调用获取新的空间。</p>
 <p>最后来看一张总表，给出了Go内存分配的基本组成结构：</p>
-<p><img src="/2024/01/08/Go%E7%AC%94%E8%AE%B0/malloc.svg"></p>
+<p><img src="/project/2024/01/08/Go%E7%AC%94%E8%AE%B0/malloc.svg"></p>
 <h2 id="垃圾回收"><a href="#垃圾回收" class="headerlink" title="垃圾回收"></a>垃圾回收</h2><p>Go的垃圾回收实现起来比较直白，相比较于Java而言，不必担心内存整理的问题，这里需要提及一下为什么不需要内存整理。Go的对于对象内存的申请是通过mspan来保存的，而当对象不再使用时，简单释放它在mspan占用的空间即可，更新bitMap，此时mspan就多了一个可用object；然后这个空间就可以立即被另一个想要申请同样大小的对象使用，即空间的复用。所以完全没必要去整理，简单释放，下次申请直接找有空闲object的mspan即可。</p>
 <p>Go对于对象存活标记使用了三色标记算法，这个算法和Java如出一辙，这里就不展开介绍了，此外，Go的GCRoots定义也和Java类似，即全局变量，栈上的对象，栈上的局部变量等。</p>
 <p>这里需要说一下Go的逃逸分析，对于不会逃逸出当前方法的对象，Go会把它分配在栈上(除非特别大)，这样可以利用栈的特性完成回收。</p>
@@ -1377,7 +1377,7 @@ chosen, revcOK := selectgo(selv, order, N)
 <p>对于栈的扩容，是通过runtime.morestack来完成的，此方法会检查剩余的栈空间是否满足当前函数调用的需求，如果不满足，则扩容二倍。morestack一般来说是编译器加入在函数调用之前的一个方法，但是不是所有的函数调用都会触发栈空间检查，为了性能，可以在方法前标记关闭检查来禁用检查操作。</p>
 <p>栈的缩容一般是GC触发，缩容规则是如果当前已用空间不足总空间的1&#x2F;4，则缩容至1&#x2F;2。这样可以有效减少热分裂。在发生栈的扩容和缩容之后，都会发生栈复制，而栈复制涉及到对于栈指针的处理，在上面我们已经论述过了。</p>
 <h2 id="远程调用"><a href="#远程调用" class="headerlink" title="远程调用"></a>远程调用</h2>
-  <p><a class="classtest-link" href="/tags/Go/" rel="tag">Go</a>, <a class="classtest-link" href="/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a> — Jan 8, 2024</p>
+  <p><a class="classtest-link" href="/project/tags/Go/" rel="tag">Go</a>, <a class="classtest-link" href="/project/tags/%E7%AC%94%E8%AE%B0/" rel="tag">笔记</a> — 2024年1月8日</p>
   
 
 
